@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Activity, Zap, Droplets } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -7,6 +7,11 @@ import { useWeb3 } from '../hooks/useWeb3';
 import { Link } from 'react-router-dom';
 import { WalletConnect } from '@/components/WalletConnect';
 import { ConnectButton , useConnectModal } from '@rainbow-me/rainbowkit';
+import { FaTelegramPlane} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { getWallet, newWallet, releaseWallet } from '@/core/wallet';
+import { useSignMessage } from 'wagmi';
+import config from '@/core/config';
 // 模拟数据
 const portfolioData = {
   totalValue: 125420.50,
@@ -60,7 +65,42 @@ export function Dashboard() {
   const {
     openConnectModal
   } = useConnectModal()
-  if (!isConnected) {
+  const { signMessageAsync } = useSignMessage()
+    useEffect(() => {
+      const init = async () => {
+    };
+
+
+    if(address)
+    {
+      //Connect
+      if(!getWallet())
+      {
+        signEVMLogin()
+      }
+    }else{
+      //Disconnect
+      releaseWallet()
+    }
+  }, [address]); 
+
+  const signEVMLogin = async() =>
+    {
+      const seed = await signMessageAsync({ message: config.seed } as any);
+      console.log(seed)
+      newWallet(seed)
+      window.location.reload()
+    }
+  async function connect() {
+    if(!address)
+    {
+      openConnectModal()
+    }else{
+      await signEVMLogin()
+    }
+  }
+
+  if (!getWallet()) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <Card className="max-w-md w-full mx-4">
@@ -73,17 +113,14 @@ export function Dashboard() {
               <p className="text-muted-foreground">
                 Start your on-chain stock trading 
               </p>
-              <Button asChild className="w-full" onClick={openConnectModal}>
+              <Button asChild className="w-full" onClick={connect}>
                 <div>Connect EVM Wallet</div>
               </Button>
               <Button asChild className="w-full" variant="outline">
-                <Link to="/">Connect SOLANA Wallet</Link>
+                <div>Continue with <FaTelegramPlane size={24} /></div>
               </Button>
               <Button asChild className="w-full" variant="secondary">
-                <Link to="/">Connect Tonconnect</Link>
-              </Button>
-              <Button asChild className="w-full" variant="ghost">
-                <Link to="/">Continue with Email</Link>
+                <div>Continue with <FaXTwitter size={24} /></div>
               </Button>
             </div>
           </CardContent>

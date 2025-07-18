@@ -23,7 +23,7 @@ export function SolanaWallet(){
 
   // Establish connection to Solana network
   const connection = new solanaWeb3.Connection(
-    "https://mainnet.helius-rpc.com/?api-key=a23d9442-2bb5-4883-aeeb-924e5acc9473",
+  import.meta.env.VITE_SOLANA_RPC_URL,
     'confirmed'
   );
 
