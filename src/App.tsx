@@ -14,7 +14,10 @@ import { LiquidityPools } from './pages/LiquidityPools';
 import { TokenSwap } from './pages/TokenSwap';
 import { Lending } from './pages/Lending';
 import { TransactionHistory } from './pages/TransactionHistory';
+import { SolanaWallet } from './pages/Example';
+import { Buffer } from 'buffer';
 
+window.Buffer = Buffer;
 const queryClient = new QueryClient();
 
 // 自定义RainbowKit主题
@@ -52,8 +55,10 @@ function App() {
                       <Route path="/swap" element={<TokenSwap />} />
                       {/* <Route path="/lending" element={<Lending />} /> */}
                       <Route path="/history" element={<TransactionHistory />} />
+                      <Route path="/test" element={<SolanaWallet />} />
+                      
                     </Routes>
-                  </main>
+                  </main> 
                 </div>
               </div>
             </Router>
