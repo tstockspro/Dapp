@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import * as solanaWeb3 from '@solana/web3.js';
 import * as nacl from 'tweetnacl';
 import * as bs58 from 'bs58';
-import { createHash } from 'crypto';
 import CryptoJS from "crypto-js";
 // Define Solana network (use 'mainnet-beta' for production)
-const SOLANA_NETWORK = 'devnet';
+const SOLANA_NETWORK = 'mainnet-beta';
 
 // Interface for wallet data
 interface Wallet {
@@ -24,7 +23,7 @@ export function SolanaWallet(){
 
   // Establish connection to Solana network
   const connection = new solanaWeb3.Connection(
-    "",
+    "https://mainnet.helius-rpc.com/?api-key=a23d9442-2bb5-4883-aeeb-924e5acc9473",
     'confirmed'
   );
 
