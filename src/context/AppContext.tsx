@@ -1,5 +1,5 @@
 // Global App Context for Tstocks DApp
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect, useMemo } from 'react';
 import { Stock, UserBalance, Position, LPToken, WalletInfo, TradeOrder } from '../types';
 import {
   mockStocks,
@@ -10,6 +10,16 @@ import {
 } from '../data/mockData';
 import { STORAGE_KEYS } from '../constants';
 import { localInit } from '@/core/wallet';
+
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { 
+  PhantomWalletAdapter, 
+  SolflareWalletAdapter 
+} from '@solana/wallet-adapter-wallets';
+import '@solana/wallet-adapter-react-ui/styles.css';
+import { clusterApiUrl } from '@solana/web3.js';
 
 interface AppState {
   // Wallet state
@@ -148,7 +158,7 @@ interface AppContextType {
   // Wallet actions
   connectWallet: () => void;
   disconnectWallet: () => void;
-  
+  connectExtensionWallet: (address:string) => void;
   // Trading actions
   createPosition: (position: Position) => void;
   closePosition: (positionId: string) => void;
@@ -163,6 +173,17 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+    const network = WalletAdapterNetwork.Mainnet;
+    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+
+    const wallets = useMemo(
+      () => [
+        new PhantomWalletAdapter(),
+        new SolflareWalletAdapter(),
+      ],
+      []
+    );
 
   // Initialize real-time price updates
   useEffect(() => {
@@ -191,6 +212,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const w = {
       address:wallet.publicKey,
       sk:wallet.secretKey,
+      connected: true,
+      balance: 0,
+      network: "mainnet",
+    }
+    dispatch({ type: 'SET_WALLET', payload: w as any });
+  };
+
+  const connectExtensionWallet = (address:string) => {
+    const wallet = localInit();
+    const w = {
+      address:address,
+      sk:"",
       connected: true,
       balance: 0,
       network: "mainnet",
@@ -230,6 +263,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     dispatch,
     connectWallet,
     disconnectWallet,
+    connectExtensionWallet,
     createPosition,
     closePosition,
     getStockPrice,
@@ -239,7 +273,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   return (
     <AppContext.Provider value={contextValue}>
-      {children}
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+              {children}
+        </WalletModalProvider>
+      </WalletProvider>
     </AppContext.Provider>
   );
 };

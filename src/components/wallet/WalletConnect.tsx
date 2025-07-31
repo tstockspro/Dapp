@@ -8,16 +8,26 @@ import { GlassCard } from '../common/GlassCard';
 import { formatAddress, formatCurrency } from '../../utils/formatters';
 import { copyToClipboard, generateWalletAddress } from '../../utils/wallet';
 import toast from 'react-hot-toast';
-
-export const WalletConnect: React.FC = () => {
-  const { state, connectWallet, disconnectWallet } = useApp();
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletConnectButton } from '@solana/wallet-adapter-react-ui';
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+export const WalletConnectLocal: React.FC = () => {
+  const { state, connectWallet, disconnectWallet ,connectExtensionWallet} = useApp();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-
+  const { setVisible } = useWalletModal()
+  const {publicKey, connected, signTransaction,disconnect } = useWallet();
   useEffect(() => {
+    console.log("connect",connected)
     //Check params
-    connectWallet();
-  }, []);
+    if(!connected)
+    {
+      connectWallet();
+    }else{
+      connectExtensionWallet(publicKey.toBase58())
+    }
+    
+  }, [connected]);
 
   const handleConnect = async () => {
     setIsConnecting(true);
@@ -151,7 +161,15 @@ export const WalletConnect: React.FC = () => {
                   
 
                   <button
-                    onClick={() => {}}
+                    onClick={() => {
+                      if(state.wallet.sk.length>10)
+                      {
+                        //Local wallet to extension wallet
+                        setVisible(true)
+                      }else{
+                        disconnect()
+                      }
+                    }}
                     className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-green-600/30 hover:bg-green-500/40 text-green-200 hover:text-white transition-colors"
                   >
                     <ArrowLeftRight className="w-4 h-4" />
@@ -162,13 +180,19 @@ export const WalletConnect: React.FC = () => {
                     </span>
                   </button>
 
-                  <button
-                    onClick={handleDisconnect}
-                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-red-600/30 hover:bg-red-500/40 text-red-200 hover:text-white transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Export Wallet</span>
-                  </button>
+                      {
+                        state.wallet.sk?.length>10 ? 
+                        <button
+                          onClick={handleDisconnect}
+                          className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-red-600/30 hover:bg-red-500/40 text-red-200 hover:text-white transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Export Wallet</span>
+                        </button>
+                        :null
+                      }
+
+
                 </div>
               </div>
             </GlassCard>

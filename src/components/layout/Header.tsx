@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Wallet, Menu, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { formatCurrency, formatAddress } from '../../utils/formatters';
-import { WalletConnect } from '../wallet/WalletConnect';
+import { WalletConnectLocal } from '../wallet/WalletConnect';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMobileMenuOpen }
             </motion.div>
           )}
           
-          <WalletConnect />
+          <WalletConnectLocal />
           
           {/* Mobile Menu Button */}
           <button
