@@ -55,8 +55,10 @@ export const TradingDashboard: React.FC = () => {
           onClick={() => setIsDepositModalOpen(true)}
           className="flex items-center space-x-2"
         >
-          <Plus className="w-4 h-4" />
-          <span>Deposit Funds</span>
+          <div className='flex'>
+            <Plus className="w-4 h-4" />
+            <span>Deposit Funds</span>
+          </div>
         </Button>
       </div>
 

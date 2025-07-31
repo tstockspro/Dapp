@@ -52,7 +52,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       onClick={onClick}
     >
       {/* Glass reflection effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none"/>
       
       {/* Content */}
       <div className="relative z-10">
