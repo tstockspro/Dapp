@@ -163,54 +163,68 @@ async function getSplBalance(mint:string ,address: string,decimals:number): Prom
     return 0; 
   }
 }
-async function initBalanace(address:string) {
-  console.log("now try get balance ",address)
-  if(!address)
-  {
+async function initBalanace(address: string) {
+  console.log("now try get balance ", address);
+  if (!address) {
     return false;
   }
-  const usdt = await getSplBalance(config.tokens.usdt,address,1e6);
+
+  // 第一步：并发获取USDT余额
+  const usdtPromise = getSplBalance(config.tokens.usdt, address, 1e6);
+
+  // 第二步：并发获取所有mockStocks的价格和余额
+  const stockPromises = mockStocks.map(async (e) => {
+    const [price, bal] = await Promise.all([
+      getTokenPrice(e.address),
+      getSplBalance(e.address, address, 1e8)
+    ]);
+    return { e, price, bal };
+  });
+
+  // 等待USDT余额
+  const usdt = await usdtPromise;
+
   let ret = [];
-  const u =   {
+  const u = {
     asset: 'USDT',
     balance: usdt,
     usdValue: usdt,
     locked: 0
-  }
-  ret.push(u)
-  const prices = []
-  for(let i in mockStocks)
-  {
-    const e = mockStocks[i];
-    const price = await getTokenPrice(e.address)
-    const bal = await getSplBalance(e.address,address,price.decimals)
-    if(price)
-    {
-      prices.push(
-        {
-          symbol: e.symbol,
-          price: price.usdPrice,
-          change24h: price.priceChange24h*price.usdPrice,
-          changePercent24h: price.priceChange24h,
-          volume24h: 0,
-          marketCap: 0,
-        }
-      )
+  };
+  ret.push(u);
+
+  const prices = [];
+
+  // 等待所有mockStock的价格和余额
+  const stockResults = await Promise.all(stockPromises);
+
+  for (const { e, price, bal } of stockResults) {
+    if (price) {
+      prices.push({
+        symbol: e.symbol,
+        price: price.usdPrice,
+        change24h: price.priceChange24h * price.usdPrice,
+        changePercent24h: price.priceChange24h,
+        volume24h: 0,
+        marketCap: 0,
+      });
     }
 
     let tmp = {
       asset: e.symbol,
       balance: bal,
-      usdValue: bal*price.usdPrice,
-      locked: 0
-    }
-    ret.push(tmp)
+      usdValue: bal * price.usdPrice,
+      locked: 0,
+    };
+    ret.push(tmp);
   }
-  return{
-    price:prices,
-    balance:ret
-  }
+
+  return {
+    price: prices,
+    balance: ret
+  };
 }
+
 export {
     restoreSolanaWallet,
     localInit,

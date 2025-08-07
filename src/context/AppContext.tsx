@@ -200,8 +200,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const init = async()=>
   {
+    const wallet = connectWallet();
     console.log("Init wallt",state)
-    const info = await initBalanace((state.wallet as any)?.address)
+    const info = await initBalanace((wallet)?.address)
     if(info)
     {
       console.log(info)
@@ -223,18 +224,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }
   // Initialize real-time price updates
   useEffect(() => {
+    console.log("connect wallet")
     // Start price updates for all stocks
-    state.stocks.forEach(stock => {
-      priceSimulator.startPriceUpdates(
-        stock,
-        (data) => {
-          dispatch({
-            type: 'UPDATE_STOCK_INFO',
-            payload: data
-          });
-        }
-      );
-    });
+    // state.stocks.forEach(stock => {
+    //   priceSimulator.startPriceUpdates(
+    //     stock,
+    //     (data) => {
+    //       dispatch({
+    //         type: 'UPDATE_STOCK_INFO',
+    //         payload: data
+    //       });
+    //     }
+    //   );
+    // });
     // dispatch({type: 'SET_LOADING',payload: true});
     
     init()
@@ -255,6 +257,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       network: "mainnet",
     }
     dispatch({ type: 'SET_WALLET', payload: w as any });
+    return w;
   };
 
   const connectExtensionWallet = (address:string) => {
