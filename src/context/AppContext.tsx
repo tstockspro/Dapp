@@ -172,6 +172,7 @@ interface AppContextType {
   connectWallet: () => void;
   disconnectWallet: () => void;
   connectExtensionWallet: (address:string) => void;
+  updateBalance: (bal:any)=>void;
   // Trading actions
   createPosition: (position: Position) => void;
   closePosition: (positionId: string) => void;
@@ -180,6 +181,7 @@ interface AppContextType {
   getStockPrice: (symbol: string) => number;
   getUserBalance: (asset: string) => UserBalance | undefined;
   getTotalPortfolioValue: () => number;
+  updateStockInfo:(info:any)=> void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -197,50 +199,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       ],
       []
     );
-
-  const init = async()=>
-  {
-    const wallet = connectWallet();
-    console.log("Init wallt",state)
-    const info = await initBalanace((wallet)?.address)
-    if(info)
-    {
-      console.log(info)
-      info.balance.forEach(e => {
-        dispatch({
-          type: 'UPDATE_BALANCE',
-          payload: e
-        });
-      });
-
-      info.price.forEach(e => {
-        dispatch({
-          type: 'UPDATE_STOCK_INFO',
-          payload: e
-        });
-      });
-    }
-    // dispatch({type: 'SET_LOADING',payload: false});
-  }
   // Initialize real-time price updates
   useEffect(() => {
     console.log("connect wallet")
     // Start price updates for all stocks
-    // state.stocks.forEach(stock => {
-    //   priceSimulator.startPriceUpdates(
-    //     stock,
-    //     (data) => {
-    //       dispatch({
-    //         type: 'UPDATE_STOCK_INFO',
-    //         payload: data
-    //       });
-    //     }
-    //   );
-    // });
-    // dispatch({type: 'SET_LOADING',payload: true});
+    state.stocks.forEach(stock => {
+      priceSimulator.startPriceUpdates(
+        stock,
+        (data) => {
+          dispatch({
+            type: 'UPDATE_STOCK_INFO',
+            payload: data
+          });
+        }
+      );
+    });
     
-    init()
-    //  { type: 'UPDATE_BALANCE'; payload: UserBalance }
     return () => {
       priceSimulator.stopAllUpdates();
     };
@@ -298,6 +272,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const getTotalPortfolioValue = (): number => {
     return state.balances.reduce((total, balance) => total + balance.usdValue, 0);
   };
+  const updateBalance = (e:any) => {
+      dispatch({
+        type: 'UPDATE_BALANCE',
+        payload: e
+      });
+  };
+
+  const updateStockInfo = (e:any) => {
+        dispatch({
+          type: 'UPDATE_STOCK_INFO',
+          payload: e
+        });
+  };
+
 
   const contextValue: AppContextType = {
     state,
@@ -309,7 +297,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     closePosition,
     getStockPrice,
     getUserBalance,
-    getTotalPortfolioValue
+    getTotalPortfolioValue,
+    updateBalance,
+    updateStockInfo
   };
 
   return (

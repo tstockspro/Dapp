@@ -1,5 +1,3 @@
-import { getAuth, getUserId } from "./storage";
-
 export function formatTime  (totalSeconds: number)  {
     const minutes = Math.floor(totalSeconds / 60)
       .toString()
@@ -14,16 +12,6 @@ function sleep (ms:number) {
     });
 }
 
-function checkAuth() {
-  let token = getAuth();
-  let uid = getUserId();
-  if(token && token.length >5 && uid && uid.length>5)
-  {
-    return true;
-  }
-
-  return false;
-}
 
 function formatPan(data:string)
 {
@@ -41,6 +29,5 @@ function formatPan(data:string)
 }
 export {
     sleep,
-    checkAuth,
     formatPan
 }

@@ -10,22 +10,40 @@ import { copyToClipboard, generateWalletAddress } from '../../utils/wallet';
 import toast from 'react-hot-toast';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { initBalanace } from '@/core/wallet';
 export const WalletConnectLocal: React.FC = () => {
-  const { state, connectWallet, disconnectWallet ,connectExtensionWallet} = useApp();
+  const { state, connectWallet, disconnectWallet ,connectExtensionWallet,updateBalance,updateStockInfo} = useApp();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const { setVisible } = useWalletModal()
   const {publicKey, connected, signTransaction,disconnect } = useWallet();
+
+  const init = async()=>
+  {
+    let wallet = connectWallet();
+    if(publicKey)
+    {
+      wallet = connectExtensionWallet(publicKey.toBase58())
+    }
+    console.log("Init wallt",state)
+    const info = await initBalanace((state.wallet)?.address)
+    if(info)
+    {
+      // console.log(info)
+      info.balance.forEach(e => {
+        updateBalance(e);
+      });
+      info.price.forEach(e => {
+        updateStockInfo(e)
+      });
+    }
+    // dispatch({type: 'SET_LOADING',payload: false});
+  }
+
   useEffect(() => {
     // console.log("connect",connected)
     //Check params
-    if(!connected)
-    {
-      connectWallet();
-    }else{
-      connectExtensionWallet(publicKey.toBase58())
-    }
-    
+    init()
   }, [connected]);
 
   const handleConnect = async () => {

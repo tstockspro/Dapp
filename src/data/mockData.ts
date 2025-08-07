@@ -341,7 +341,7 @@ export class PriceSimulator {
   startPriceUpdates(stock : Stock, callback: (data: any) => void) {
     const interval = setInterval(async () => {
       const data = await getTokenPrice(stock.address);
-      console.log(data)
+      // console.log(data)
       if(data)
       {
         callback(
