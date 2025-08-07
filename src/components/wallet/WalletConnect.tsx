@@ -25,8 +25,8 @@ export const WalletConnectLocal: React.FC = () => {
     {
       wallet = connectExtensionWallet(publicKey.toBase58())
     }
-    console.log("Init wallt",state)
-    const info = await initBalanace((state.wallet)?.address)
+    console.log("Init wallt",wallet)
+    const info = await initBalanace((wallet as any)?.address)
     if(info)
     {
       // console.log(info)
@@ -38,6 +38,7 @@ export const WalletConnectLocal: React.FC = () => {
       });
     }
     // dispatch({type: 'SET_LOADING',payload: false});
+    console.log("final state :: ",state)
   }
 
   useEffect(() => {

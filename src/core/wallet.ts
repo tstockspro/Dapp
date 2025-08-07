@@ -158,8 +158,10 @@ async function getSplBalance(mint:string ,address: string,decimals:number): Prom
   const ata = await getAssociatedTokenAddress(tokenMint, owner);
   try {
     const accountInfo = await getAccount(connection, ata);
+    console.log("mint:",mint,accountInfo.amount,Number(accountInfo.amount) / Math.pow(10,decimals))
     return Number(accountInfo.amount) / Math.pow(10,decimals);
   } catch (err) {
+    console.error("mint:",mint,err)
     return 0; 
   }
 }
@@ -168,20 +170,15 @@ async function initBalanace(address: string) {
   if (!address) {
     return false;
   }
-
-  // 第一步：并发获取USDT余额
-  const usdtPromise = getSplBalance(config.tokens.usdt, address, 1e6);
-
-  // 第二步：并发获取所有mockStocks的价格和余额
+  const usdtPromise = getSplBalance(config.tokens.usdt, address, 6);
   const stockPromises = mockStocks.map(async (e) => {
     const [price, bal] = await Promise.all([
       getTokenPrice(e.address),
-      getSplBalance(e.address, address, 1e8)
+      getSplBalance(e.address, address, 8)
     ]);
     return { e, price, bal };
   });
 
-  // 等待USDT余额
   const usdt = await usdtPromise;
 
   let ret = [];
@@ -194,8 +191,6 @@ async function initBalanace(address: string) {
   ret.push(u);
 
   const prices = [];
-
-  // 等待所有mockStock的价格和余额
   const stockResults = await Promise.all(stockPromises);
 
   for (const { e, price, bal } of stockResults) {
@@ -218,7 +213,7 @@ async function initBalanace(address: string) {
     };
     ret.push(tmp);
   }
-
+  console.log(ret)
   return {
     price: prices,
     balance: ret

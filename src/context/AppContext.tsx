@@ -169,9 +169,9 @@ interface AppContextType {
   dispatch: React.Dispatch<AppAction>;
   
   // Wallet actions
-  connectWallet: () => void;
+  connectWallet: () => WalletInfo;
   disconnectWallet: () => void;
-  connectExtensionWallet: (address:string) => void;
+  connectExtensionWallet: (address:string) => WalletInfo;
   updateBalance: (bal:any)=>void;
   // Trading actions
   createPosition: (position: Position) => void;
@@ -201,7 +201,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
   // Initialize real-time price updates
   useEffect(() => {
-    console.log("connect wallet")
     // Start price updates for all stocks
     state.stocks.forEach(stock => {
       priceSimulator.startPriceUpdates(
@@ -231,11 +230,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       network: "mainnet",
     }
     dispatch({ type: 'SET_WALLET', payload: w as any });
-    return w;
+    return w as WalletInfo;
   };
 
   const connectExtensionWallet = (address:string) => {
-    const wallet = localInit();
     const w = {
       address:address,
       sk:"",
@@ -244,6 +242,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       network: "mainnet",
     }
     dispatch({ type: 'SET_WALLET', payload: w as any });
+    return w as WalletInfo;
   };
 
   const disconnectWallet = () => {
