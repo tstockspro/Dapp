@@ -33,7 +33,6 @@ interface AppState {
   positions: Position[];
   lpTokens: LPToken[];
   orders: TradeOrder[];
-  
   // UI state
   loading: boolean;
   error: string | null;
@@ -47,6 +46,7 @@ type AppAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'UPDATE_STOCK_PRICE'; payload: { symbol: string; price: number } }
+  | { type: 'UPDATE_STOCK_INFO'; payload: { symbol: string; price: number ;change24h: number ; changePercent24h: number ;volume24h:number;marketCap:number;} }
   | { type: 'UPDATE_BALANCE'; payload: UserBalance }
   | { type: 'ADD_POSITION'; payload: Position }
   | { type: 'UPDATE_POSITION'; payload: Position }
@@ -54,6 +54,7 @@ type AppAction =
   | { type: 'ADD_ORDER'; payload: TradeOrder }
   | { type: 'UPDATE_ORDER'; payload: TradeOrder }
   | { type: 'UPDATE_LP_TOKEN'; payload: LPToken }
+  | { type: 'UPDATE_STOCKS'; payload: Stock }
   | { type: 'INITIALIZE_DATA' };
 
 const initialState: AppState = {
@@ -92,7 +93,19 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           [action.payload.symbol]: action.payload.price
         }
       };
-    
+    case 'UPDATE_STOCK_INFO':
+      return {
+        ...state,
+        stocks: state.stocks.map(stock => 
+          stock.symbol === action.payload.symbol
+            ? { ...stock, price: action.payload.price,change24h: action.payload.change24h,changePercent24h: action.payload.changePercent24h,volume24h: action.payload.volume24h,marketCap: action.payload.marketCap }
+            : stock
+        ),
+        priceUpdates: {
+          ...state.priceUpdates,
+          [action.payload.symbol]: action.payload.price
+        }
+      };
     case 'UPDATE_BALANCE':
       return {
         ...state,
@@ -185,24 +198,46 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       []
     );
 
+  const init = async()=>
+  {
+    console.log("Init wallt",state)
+    const info = await initBalanace((state.wallet as any)?.address)
+    if(info)
+    {
+      console.log(info)
+      info.balance.forEach(e => {
+        dispatch({
+          type: 'UPDATE_BALANCE',
+          payload: e
+        });
+      });
+
+      info.price.forEach(e => {
+        dispatch({
+          type: 'UPDATE_STOCK_INFO',
+          payload: e
+        });
+      });
+    }
+    // dispatch({type: 'SET_LOADING',payload: false});
+  }
   // Initialize real-time price updates
   useEffect(() => {
     // Start price updates for all stocks
     state.stocks.forEach(stock => {
       priceSimulator.startPriceUpdates(
-        stock.symbol,
-        stock.price,
-        (newPrice) => {
+        stock,
+        (data) => {
           dispatch({
-            type: 'UPDATE_STOCK_PRICE',
-            payload: { symbol: stock.symbol, price: newPrice }
+            type: 'UPDATE_STOCK_INFO',
+            payload: data
           });
         }
       );
     });
-
-    console.log("Init wallt",state)
-    initBalanace((state.wallet as any)?.address)
+    // dispatch({type: 'SET_LOADING',payload: true});
+    
+    init()
     //  { type: 'UPDATE_BALANCE'; payload: UserBalance }
     return () => {
       priceSimulator.stopAllUpdates();

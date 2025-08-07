@@ -4,6 +4,8 @@ import { getKp, setKp } from './storage';
 import { Buffer } from 'buffer';
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
 import config from './config';
+import { mockStocks } from '@/data/mockData';
+import { api_token_price } from './api';
 const connection = new Connection( (import.meta as any).env.VITE_RPC, 'confirmed');
 
 const restoreSolanaWallet = (seed: string) =>{
@@ -129,24 +131,36 @@ async function decrypt(pwd: string, ciphertext: string): Promise<Keypair | false
   }
 }
 
+async function getTokenPrice(token:string) {
+  const ret = {
+    "usdPrice": 0,
+    "blockId": 0,
+    "decimals": 8,
+    "priceChange24h": 0
+  }
+  const r = await api_token_price(token);
+  // console.log(r);
+  if(r && r[token])
+  {
+    return r[token];
+  }
+  return ret;
+}
 async function getSolBalance(address: string): Promise<number> {
   const publicKey = new PublicKey(address);
   const lamports = await connection.getBalance(publicKey);
   return lamports / 1e9;
 }
 
-async function getSplBalance(mint:string ,address: string): Promise<number> {
+async function getSplBalance(mint:string ,address: string,decimals:number): Promise<number> {
   const owner = new PublicKey(address);
   const tokenMint = new PublicKey(mint)
   const ata = await getAssociatedTokenAddress(tokenMint, owner);
   try {
     const accountInfo = await getAccount(connection, ata);
-    return Number(accountInfo.amount) / 1e6;
+    return Number(accountInfo.amount) / Math.pow(10,decimals);
   } catch (err) {
-    if (err.message.includes('Failed to find account')) {
-      return 0; 
-    }
-    throw err;
+    return 0; 
   }
 }
 async function initBalanace(address:string) {
@@ -155,10 +169,47 @@ async function initBalanace(address:string) {
   {
     return false;
   }
-  const usdt = await getSplBalance(config.tokens.usdt,address);
-  let ret = {};
-  ret['usd'] = usdt
-  console.log(ret)
+  const usdt = await getSplBalance(config.tokens.usdt,address,1e6);
+  let ret = [];
+  const u =   {
+    asset: 'USDT',
+    balance: usdt,
+    usdValue: usdt,
+    locked: 0
+  }
+  ret.push(u)
+  const prices = []
+  for(let i in mockStocks)
+  {
+    const e = mockStocks[i];
+    const price = await getTokenPrice(e.address)
+    const bal = await getSplBalance(e.address,address,price.decimals)
+    if(price)
+    {
+      prices.push(
+        {
+          symbol: e.symbol,
+          price: price.usdPrice,
+          change24h: price.priceChange24h*price.usdPrice,
+          changePercent24h: price.priceChange24h,
+          volume24h: 0,
+          marketCap: 0,
+        }
+      )
+    }
+
+    let tmp = {
+      asset: e.symbol,
+      balance: bal,
+      usdValue: bal*price.usdPrice,
+      locked: 0
+    }
+    ret.push(tmp)
+  }
+  return{
+    price:prices,
+    balance:ret
+  }
 }
 export {
     restoreSolanaWallet,
@@ -168,5 +219,6 @@ export {
     decrypt,
     getSolBalance,
     getSplBalance,
-    initBalanace
+    initBalanace,
+    getTokenPrice
 }

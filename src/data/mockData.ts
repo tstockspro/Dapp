@@ -1,5 +1,7 @@
 // Mock Data for Tstocks DApp
+import { api_token_price } from '@/core/api';
 import { Stock, TradingPair, UserBalance, Position, LPToken, DepositMethod, VaultInfo } from '../types';
+import { getTokenPrice } from '@/core/wallet';
 
 export const mockStocks: Stock[] = [
   {
@@ -47,7 +49,7 @@ export const mockStocks: Stock[] = [
   {
     id: 'googl',
     symbol: 'GOOGL',
-    name: 'Alphabet Inc.',
+    name: 'GOOGL Inc.',
     price: 145.67,
     change24h: -2.34,
     changePercent24h: -1.58,
@@ -336,16 +338,26 @@ export class PriceSimulator {
   private intervals: Map<string, NodeJS.Timeout> = new Map();
   private callbacks: Map<string, (price: number) => void> = new Map();
 
-  startPriceUpdates(symbol: string, initialPrice: number, callback: (price: number) => void) {
-    let currentPrice = initialPrice;
-    this.callbacks.set(symbol, callback);
+  startPriceUpdates(stock : Stock, callback: (data: any) => void) {
+    const interval = setInterval(async () => {
+      const data = await getTokenPrice(stock.address);
+      console.log(data)
+      if(data)
+      {
+        callback(
+          {
+            symbol: stock.symbol,
+            price: data.usdPrice,
+            change24h: data.priceChange24h*data.usdPrice,
+            changePercent24h: data.priceChange24h,
+            volume24h: 0,
+            marketCap: 0,
+          }
+        );
+      }
+    }, 30000); // Update every 10 seconds
     
-    const interval = setInterval(() => {
-      currentPrice = generatePriceUpdate(currentPrice);
-      callback(currentPrice);
-    }, 2000); // Update every 2 seconds
-    
-    this.intervals.set(symbol, interval);
+    this.intervals.set(stock.symbol, interval);
   }
 
   stopPriceUpdates(symbol: string) {

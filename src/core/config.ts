@@ -5,6 +5,12 @@ const config = {
             sec:"",
         }
     },
+    api:{
+        jup:{
+            liteUrl:"https://lite-api.jup.ag/",
+            price:"price/v3"
+        }
+    },
     tokens:{
         usdt:"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
     },
