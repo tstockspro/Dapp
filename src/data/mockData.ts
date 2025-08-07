@@ -11,8 +11,10 @@ export const mockStocks: Stock[] = [
     changePercent24h: 5.23,
     volume24h: 125000000,
     marketCap: 792000000000,
-    logo: '/images/stocks/tesla.png',
-    description: 'Electric vehicle and clean energy company'
+    logo: "https://r2.tstocks.pro/stocks/tesla.png",
+    description: 'Electric vehicle and clean energy company',
+    information:"https://assets.backed.fi/products/tesla-xstock",
+    address:'XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB'
   },
   {
     id: 'nvda',
@@ -23,8 +25,10 @@ export const mockStocks: Stock[] = [
     changePercent24h: -1.71,
     volume24h: 89000000,
     marketCap: 2160000000000,
-    logo: '/images/stocks/nvidia.jpg',
-    description: 'GPU and AI semiconductor technology'
+    logo: "https://r2.tstocks.pro/stocks/nvidia.png",
+    description: 'GPU and AI semiconductor technology',
+    information:"https://assets.backed.fi/products/novo-nordisk-xstock",
+    address:'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh'
   },
   {
     id: 'aapl',
@@ -35,8 +39,10 @@ export const mockStocks: Stock[] = [
     changePercent24h: 1.79,
     volume24h: 156000000,
     marketCap: 3010000000000,
-    logo: '/images/stocks/apple.jpg',
-    description: 'Consumer electronics and software services'
+    logo: "https://r2.tstocks.pro/stocks/apple.png",
+    description: 'Consumer electronics and software services',
+    information:"https://assets.backed.fi/products/apple-xstock",
+    address:'XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp'
   },
   {
     id: 'googl',
@@ -47,8 +53,10 @@ export const mockStocks: Stock[] = [
     changePercent24h: -1.58,
     volume24h: 78000000,
     marketCap: 1850000000000,
-    logo: '/images/stocks/google.jpg',
-    description: 'Internet search and advertising technology'
+    logo: "https://r2.tstocks.pro/stocks/google.png",
+    description: 'Internet search and advertising technology',
+    information:"XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
+    address:'XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN'
   },
   {
     id: 'amzn',
@@ -59,8 +67,24 @@ export const mockStocks: Stock[] = [
     changePercent24h: 5.16,
     volume24h: 92000000,
     marketCap: 1840000000000,
-    logo: '/images/stocks/amazon.png',
-    description: 'E-commerce and cloud computing services'
+    logo: "https://r2.tstocks.pro/stocks/amazon.png",
+    description: 'E-commerce and cloud computing services',
+    information:"https://assets.backed.fi/products/amazon-xstock",
+    address:'Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg'
+  },
+    {
+    id: 'meta',
+    symbol: 'META',
+    name: 'Meta Inc.',
+    price: 178.25,
+    change24h: 8.75,
+    changePercent24h: 5.16,
+    volume24h: 92000000,
+    marketCap: 1840000000000,
+    logo: "https://r2.tstocks.pro/stocks/meta.png",
+    description: 'Meta Inc',
+    information:"https://assets.backed.fi/products/meta-xstock",
+    address:'Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu'
   }
 ];
 
@@ -105,18 +129,6 @@ export const mockUserBalances: UserBalance[] = [
     locked: 2500.00
   },
   {
-    asset: 'USDC',
-    balance: 8920.50,
-    usdValue: 8920.50,
-    locked: 1200.00
-  },
-  {
-    asset: 'TON',
-    balance: 245.67,
-    usdValue: 1228.35,
-    locked: 50.00
-  },
-  {
     asset: 'TSLA',
     balance: 12.5,
     usdValue: 3106.50,
@@ -130,6 +142,24 @@ export const mockUserBalances: UserBalance[] = [
   },
   {
     asset: 'AAPL',
+    balance: 25.0,
+    usdValue: 4897.25,
+    locked: 0
+  },
+  {
+    asset: 'GOOGL',
+    balance: 25.0,
+    usdValue: 4897.25,
+    locked: 0
+  },
+  {
+    asset: 'META',
+    balance: 25.0,
+    usdValue: 4897.25,
+    locked: 0
+  },
+  {
+    asset: 'AMZN',
     balance: 25.0,
     usdValue: 4897.25,
     locked: 0
@@ -216,23 +246,25 @@ export const mockLPTokens: LPToken[] = [
 ];
 
 export const mockDepositMethods: DepositMethod[] = [
+    {
+    id: 'sol',
+    name: 'USDT(SOLANA)',
+    symbol: 'USDT',
+    network: 'SOL',
+    minDeposit: 0.001,
+    processingTime: '0.5-1 minutes',
+    fee: 0.005,
+    logo:"https://r2.tstocks.pro/chains/usdt.png",
+  },
   {
     id: 'ton',
     name: 'TON',
-    symbol: 'TON',
     network: 'TON',
+    symbol: 'TON',
     minDeposit: 1,
     processingTime: '1-2 minutes',
-    fee: 0.01
-  },
-  {
-    id: 'eth',
-    name: 'Ethereum',
-    symbol: 'ETH',
-    network: 'Ethereum',
-    minDeposit: 0.001,
-    processingTime: '5-10 minutes',
-    fee: 0.005
+    fee: 0.01,
+    logo:"https://r2.tstocks.pro/chains/ton.png",
   },
   {
     id: 'trx',
@@ -241,7 +273,8 @@ export const mockDepositMethods: DepositMethod[] = [
     network: 'TRON',
     minDeposit: 10,
     processingTime: '1-3 minutes',
-    fee: 1
+    fee: 1,
+    logo:"https://r2.tstocks.pro/chains/trx.png",
   },
   {
     id: 'usdt-trc20',
@@ -250,43 +283,44 @@ export const mockDepositMethods: DepositMethod[] = [
     network: 'TRON',
     minDeposit: 1,
     processingTime: '1-3 minutes',
-    fee: 1
+    fee: 1,
+    logo:"https://r2.tstocks.pro/chains/usdt.png",
   }
 ];
 
 export const mockVaults: VaultInfo[] = [
   {
-    id: 'vault-growth',
-    name: 'Growth Vault',
-    description: 'High-growth tech stocks with leveraged strategies',
+    id: 'vault-low',
+    name: 'Low Leverage Vault',
+    description: 'Lend USDT to 1x~5x leverage margin trading',
     tvl: 12500000,
     apr: 24.5,
     minDeposit: 100,
     userDeposit: 5000,
     strategy: 'Leveraged Long Positions',
-    riskLevel: 'high'
+    riskLevel: 'low'
   },
   {
     id: 'vault-stable',
-    name: 'Stable Yield Vault',
-    description: 'Conservative stablecoin strategies with LP rewards',
+    name: 'Stable Leverage Vault',
+    description: 'Lend USDT to 5x~20x leverage margin trading',
     tvl: 8750000,
     apr: 15.2,
     minDeposit: 50,
     userDeposit: 2500,
     strategy: 'Liquidity Provision',
-    riskLevel: 'low'
+    riskLevel: 'medium'
   },
   {
-    id: 'vault-balanced',
-    name: 'Balanced Portfolio',
-    description: 'Mixed strategy with stocks and stablecoins',
+    id: 'vault-high',
+    name: 'Max Leverage Vault',
+    description: 'Lend USDT to 20x~100x leverage margin trading',
     tvl: 6800000,
     apr: 19.8,
     minDeposit: 75,
     userDeposit: 1250,
     strategy: 'Long/Short Hedging',
-    riskLevel: 'medium'
+    riskLevel: 'high'
   }
 ];
 

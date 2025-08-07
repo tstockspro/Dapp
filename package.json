@@ -4,16 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm install && vite",
-    "build": "pnpm install && tsc -b && vite build",
-    "lint": "pnpm install && eslint .",
-    "preview": "pnpm install && vite preview"
+    "dev": "yarn && vite",
+    "build": "yarn && tsc -b && vite build",
+    "lint": "yarn && eslint .",
+    "preview": "yarn && vite preview"
   },
   "dependencies": {
-    "@solana/wallet-adapter-base": "^0.9.27",
-    "@solana/wallet-adapter-react": "^0.15.39",
-    "@solana/wallet-adapter-react-ui": "^0.9.39",
-    "@solana/wallet-adapter-wallets": "^0.19.37",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -42,11 +38,12 @@
     "@radix-ui/react-toggle": "^1.1.1",
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/wallet-adapter-react-ui": "^0.9.39",
+    "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.2",
-    "@ton-community/assets-sdk": "github:ton-community/assets-sdk",
-    "@ton/core": "^0.61.0",
-    "@ton/crypto": "^3.3.0",
-    "@tonconnect/ui-react": "^2.2.0",
     "@types/qrcode": "^1.5.5",
     "bs58": "^6.0.0",
     "buffer": "^6.0.3",
@@ -67,12 +64,9 @@
     "react-hot-toast": "^2.5.2",
     "react-resizable-panels": "^2.1.7",
     "react-router-dom": "^6",
-    "recharts": "^2.12.4",
-    "sonner": "^1.7.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "vaul": "^1.1.2",
-    "zod": "^3.24.1"
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

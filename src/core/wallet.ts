@@ -1,7 +1,11 @@
-import { Keypair } from '@solana/web3.js';
-import { Buffer } from 'buffer';
+import { Keypair,Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import { getKp, setKp } from './storage';
+import { Buffer } from 'buffer';
+import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
+import config from './config';
+const connection = new Connection( (import.meta as any).env.VITE_RPC, 'confirmed');
+
 const restoreSolanaWallet = (seed: string) =>{
   const seedBuffer = Buffer.from(seed);
   const seedBytes = seedBuffer.length >= 32 
@@ -125,10 +129,44 @@ async function decrypt(pwd: string, ciphertext: string): Promise<Keypair | false
   }
 }
 
+async function getSolBalance(address: string): Promise<number> {
+  const publicKey = new PublicKey(address);
+  const lamports = await connection.getBalance(publicKey);
+  return lamports / 1e9;
+}
+
+async function getSplBalance(mint:string ,address: string): Promise<number> {
+  const owner = new PublicKey(address);
+  const tokenMint = new PublicKey(mint)
+  const ata = await getAssociatedTokenAddress(tokenMint, owner);
+  try {
+    const accountInfo = await getAccount(connection, ata);
+    return Number(accountInfo.amount) / 1e6;
+  } catch (err) {
+    if (err.message.includes('Failed to find account')) {
+      return 0; 
+    }
+    throw err;
+  }
+}
+async function initBalanace(address:string) {
+  console.log("now try get balance ",address)
+  if(!address)
+  {
+    return false;
+  }
+  const usdt = await getSplBalance(config.tokens.usdt,address);
+  let ret = {};
+  ret['usd'] = usdt
+  console.log(ret)
+}
 export {
     restoreSolanaWallet,
     localInit,
     importInit,
     encrypt,
-    decrypt
+    decrypt,
+    getSolBalance,
+    getSplBalance,
+    initBalanace
 }

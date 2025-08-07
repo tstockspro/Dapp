@@ -4,6 +4,41 @@ const config = {
         router:{
             sec:"",
         }
+    },
+    tokens:{
+        usdt:"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+    },
+    stocks:{
+        tesla:{
+            name:"Tesla",
+            address:"XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            logo:"https://r2.tstocks.pro/stocks/tesla.png",
+            details:"https://assets.backed.fi/products/tesla-xstock"
+        },
+        nvidia:{
+            name:"NVIDIA",
+            address:"Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            logo:"https://r2.tstocks.pro/stocks/nvidia.png",
+            details:"https://assets.backed.fi/products/novo-nordisk-xstock"
+        },
+        meta:{
+            name:"Meta",
+            address:"Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+            logo:"https://r2.tstocks.pro/stocks/meta.png",
+            details:"https://assets.backed.fi/products/meta-xstock"
+        },
+        apple:{
+            name:"Apple",
+            address:"XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            logo:"https://r2.tstocks.pro/stocks/apple.png",
+            details:"https://assets.backed.fi/products/apple-xstock"
+        },
+        amazon:{
+            name:"Amazon",
+            address:"Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+            logo:"https://r2.tstocks.pro/stocks/amazon.png",
+            details:"https://assets.backed.fi/products/amazon-xstock"
+        }
     }
 }
 export default config

@@ -6,6 +6,10 @@ import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { TradingDashboard } from './components/TradingDashboard';
 import './App.css';
+import { Buffer } from 'buffer';
+if (!window.Buffer) {
+  window.Buffer = Buffer;
+}
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

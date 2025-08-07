@@ -101,7 +101,9 @@ export const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) =
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <span className="text-2xl">{networkIcons[method.network] || '🔷'}</span>
+                            <span className="text-2xl">
+                              <img src={method.logo} style={{maxWidth:"40px",maxHeight:"40px"}}/>
+                              </span>
                             <div className="text-left">
                               <p className="font-medium">{method.name}</p>
                               <p className="text-sm opacity-75">{method.network}</p>

@@ -9,7 +9,7 @@ import {
   priceSimulator
 } from '../data/mockData';
 import { STORAGE_KEYS } from '../constants';
-import { localInit } from '@/core/wallet';
+import { initBalanace, localInit } from '@/core/wallet';
 
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -201,6 +201,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       );
     });
 
+    console.log("Init wallt",state)
+    initBalanace((state.wallet as any)?.address)
+    //  { type: 'UPDATE_BALANCE'; payload: UserBalance }
     return () => {
       priceSimulator.stopAllUpdates();
     };

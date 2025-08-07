@@ -1,5 +1,5 @@
 // Main trading dashboard component
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { StockList } from './trading/StockList';
@@ -12,6 +12,7 @@ import { Button } from './common/Button';
 import { useApp } from '../context/AppContext';
 import { mockVaults } from '../data/mockData';
 import { Stock } from '../types';
+import { initBalanace } from '@/core/wallet';
 
 export const TradingDashboard: React.FC = () => {
   const { state } = useApp();
@@ -24,6 +25,11 @@ export const TradingDashboard: React.FC = () => {
     { id: 'portfolio', label: 'Portfolio', description: 'Positions & P&L' },
     { id: 'vaults', label: 'Vaults', description: 'LP Tokens & Staking' }
   ];
+
+
+  useEffect(() => {
+    
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">

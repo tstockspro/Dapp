@@ -11,6 +11,8 @@ export interface Stock {
   marketCap: number;
   logo: string;
   description: string;
+  information: string;
+  address: string;
 }
 
 export interface TradingPair {
@@ -72,6 +74,7 @@ export interface DepositMethod {
   minDeposit: number;
   processingTime: string;
   fee: number;
+  logo:string;
 }
 
 export interface TradeOrder {
