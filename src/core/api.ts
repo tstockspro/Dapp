@@ -87,7 +87,35 @@ async function requester(url: string, requestOptions: any) {
     }
   }
 
+  async function api_spot_sell(mint:string,address:string,amount:string) {
+    try {
+      return await requester(
+        `${config.api.tstocks.baseUrl}${config.api.tstocks.router.spot.sell}`,
+        request_post_unauth({mint,address,amount}),
+      );
+    } catch (e) {
+      console.error(e);
+  
+      return 0;
+    }
+  }
+
+
+  async function api_margin_buy(mint:string,address:string,margin:string,amount:string) {
+    try {
+      return await requester(
+        `${config.api.tstocks.baseUrl}${config.api.tstocks.router.margin.buy}`,
+        request_post_unauth({mint,address,margin,amount}),
+      );
+    } catch (e) {
+      console.error(e);
+  
+      return 0;
+    }
+  }
   export {
     api_token_price,
-    api_spot_buy
+    api_spot_buy,
+    api_spot_sell,
+    api_margin_buy
   }

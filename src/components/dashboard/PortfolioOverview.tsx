@@ -41,8 +41,8 @@ export const PortfolioOverview: React.FC = () => {
     },
     {
       label: 'Available Balance',
-      value: formatCurrency(state.balances.find(b => b.asset === 'USDT')?.balance || 0),
-      change: 'USDT',
+      value: formatCurrency(state.balances.find(b => b.asset === 'USDC')?.balance || 0),
+      change: 'USDC',
       changeValue: 'Ready to trade',
       icon: PieChart,
       color: 'text-blue-400'

@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMobileMenuOpen }
               transition={{ delay: 0.2 }}
             >
               <p className="text-xs text-purple-200">Portfolio Value</p>
-              <p className="text-lg font-bold text-white">{formatCurrency(state.balances.find(b => b.asset === 'USDT')?.balance || 0)}</p>
+              <p className="text-lg font-bold text-white">{formatCurrency(state.balances.find(b => b.asset === 'USDC')?.balance || 0)}</p>
             </motion.div>
           )}
           

@@ -40,23 +40,23 @@ This repo is to build a onchain RWA stock trading protocol . Allows anyone to tr
     
 - **Spot trading**
   - Gasless transaction
-    - [User] Swap transaction (USDT/USDC)
-    - [User] Send fee in USDT
+    - [User] Swap transaction (USDC/USDC)
+    - [User] Send fee in USDC
     - [Payer] Gas less transaction (payer)
   - PNL analyze
   - Asserts controller : BUY|SELL
 
 - **Leverage make long trading**
   - Staking
-    - [Staker] Send 100 USDT to vault
+    - [Staker] Send 100 USDC to vault
   - Withdraw
-    - [Staker] Withdraw 100.1 USDT
+    - [Staker] Withdraw 100.1 USDC
   - Make Long
-    - [User]Send 10 USDT to sender transaction 
+    - [User]Send 10 USDC to sender transaction 
     - [Sender] Swap transaction (90 + 10USDT) for stock
     - [Sender] Hold stock
   - Liquidtion or Close
-    - [Sender] Sell all stock coin . Send fee to vault . take back 90 USDT
+    - [Sender] Sell all stock coin . Send fee to vault . take back 90 USDC
     - [Sender] Send all others to user 
 
 - **Leverage make short trading**
@@ -66,9 +66,9 @@ This repo is to build a onchain RWA stock trading protocol . Allows anyone to tr
     - [Staker] Withdraw 100.1$ xTesla
   - Make Short
     - [Staker]Send 100 stock coin to Holder
-    - [User] Send 10 USDT to Holder
+    - [User] Send 10 USDC to Holder
     - [Holder] Sell 90$[0.9] stock coin and hold with User
   - Liquidtion or Close
-    - [Holder] Buy [0.9] stocks with USDT
+    - [Holder] Buy [0.9] stocks with USDC
     - [Holder] Send fee to vault
-    - [Holder] Send remain USDT to user
+    - [Holder] Send remain USDC to user

@@ -148,13 +148,13 @@ export const WalletConnectLocal: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-purple-200">Balance</span>
                     <span className="text-white font-bold">
-                      {formatCurrency(state.balances.find(b => b.asset === 'USDT')?.balance || 0)} $
+                      {formatCurrency(state.balances.find(b => b.asset === 'USDC')?.balance || 0)} $
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-purple-200 text-sm">USDT Value</span>
+                    <span className="text-purple-200 text-sm">USDC Value</span>
                     <span className="text-purple-300 text-sm">
-                       {formatCurrency(state.balances.find(b => b.asset === 'USDT')?.balance || 0)}
+                       {formatCurrency(state.balances.find(b => b.asset === 'USDC')?.balance || 0)}
                     </span>
                   </div>
                 </div>

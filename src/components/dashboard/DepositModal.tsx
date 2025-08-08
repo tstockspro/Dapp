@@ -233,7 +233,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) =
                   <h3 className="text-lg font-semibold text-white">Recent Deposits</h3>
                   <div className="space-y-2">
                     <DepositStatus
-                      amount="500 USDT"
+                      amount="500 USDC"
                       status="completed"
                       time="2 hours ago"
                       txHash="0x1234...5678"

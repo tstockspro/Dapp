@@ -2,7 +2,7 @@ import { Keypair,Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import { getKp, setKp } from './storage';
 import { Buffer } from 'buffer';
-import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, getAccount, getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import config from './config';
 import { mockStocks } from '@/data/mockData';
 import { api_token_price } from './api';
@@ -172,27 +172,55 @@ async function getSplBalance(mint:string ,address: string,decimals:number): Prom
     return 0; 
   }
 }
+async function getSpl2022Balance(
+  mint: string,
+  address: string,
+  decimals: number
+): Promise<number> {
+  const owner = new PublicKey(address);
+  const tokenMint = new PublicKey(mint);
+
+  // 获取 ATA
+  const ata = await getAssociatedTokenAddress(
+    tokenMint, 
+    owner,
+    false, // allowOwnerOffCurve = false
+    TOKEN_2022_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  );
+
+  try {
+    // 获取账户信息（指定 tokenProgramId）
+    const accountInfo = await getAccount(connection, ata, undefined, TOKEN_2022_PROGRAM_ID);
+    const balance = Number(accountInfo.amount) / (10 ** decimals);
+    console.log("mint:", mint, "raw:", accountInfo.amount.toString(), "balance:", balance);
+    return balance;
+  } catch (err) {
+    console.error("mint:", mint, err);
+    return 0;
+  }
+}
 async function initBalanace(address: string) {
   console.log("now try get balance ", address);
   if (!address) {
     return false;
   }
-  const usdtPromise = getSplBalance(config.tokens.usdt, address, 6);
+  const usdcPromise = getSplBalance(config.tokens.usdc, address, 6);
   const stockPromises = mockStocks.map(async (e) => {
     const [price, bal] = await Promise.all([
       getTokenPrice(e.address),
-      getSplBalance(e.address, address, 8)
+      getSpl2022Balance(e.address, address, 8)
     ]);
     return { e, price, bal };
   });
 
-  const usdt = await usdtPromise;
+  const usdc = await usdcPromise;
 
   let ret = [];
   const u = {
-    asset: 'USDT',
-    balance: usdt,
-    usdValue: usdt,
+    asset: 'USDC',
+    balance: usdc,
+    usdValue: usdc,
     locked: 0
   };
   ret.push(u);

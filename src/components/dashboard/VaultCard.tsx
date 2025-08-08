@@ -192,7 +192,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({ vault, delay = 0 }) => {
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-sm text-purple-200">Amount (USDT)</label>
+                    <label className="text-sm text-purple-200">Amount (USDC)</label>
                     <input
                       type="number"
                       value={depositAmount}

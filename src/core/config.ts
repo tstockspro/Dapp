@@ -25,7 +25,8 @@ const config = {
         }
     },
     tokens:{
-        usdt:"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+        usdt:"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        usdc:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
     },
     stocks:{
         tesla:{

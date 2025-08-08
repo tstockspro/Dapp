@@ -9,7 +9,7 @@ import { Button } from '../common/Button';
 import { formatCurrency, formatPercent, generatePositionId } from '../../utils/formatters';
 import { calculatePnL } from '../../utils/formatters';
 import toast from 'react-hot-toast';
-import { spotBuy } from '@/core/trade';
+import { spotBuy, spotSell } from '@/core/trade';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { sendTx } from '@/core/wallet';
 
@@ -28,28 +28,45 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
   const [isTrading, setIsTrading] = useState(false);
   const { sendTransaction } = useWallet()
 
-  const usdtBalance = getUserBalance('USDT');
-  const stockBalance = getUserBalance(selectedStock.symbol);
-  
+  const [stockBalance, setStockBalance] = useState(getUserBalance(selectedStock.symbol));
+
+  const [usdtBalance, setUsdtBalance] = useState(getUserBalance('USDC'));
   const [maxAmount, setMaxAmount] = useState(
     side === 'buy' 
-    ?  Number(getUserBalance('USDT').balance) / getStockPrice(selectedStock.symbol)
+    ?  Number(getUserBalance('USDC').balance) / getStockPrice(selectedStock.symbol)
     : Number(getUserBalance(selectedStock.symbol).balance)
   );
 
-  const totalCost = parseFloat(amount || '0') * selectedStock.price;
+  const [totalCost, setTotalCost] = useState(parseFloat(amount || '0') * getStockPrice(selectedStock.symbol))
   const leveragedAmount = activeTab === 'leveraged' ? totalCost * leverage : totalCost;
 
   useEffect(() => {
   // console.log(
-  //   "Trading Panel ::",getUserBalance('USDT'),getUserBalance(selectedStock.symbol),getStockPrice(selectedStock.symbol)
+  //   "Trading Panel ::",getUserBalance('USDC'),getUserBalance(selectedStock.symbol),getStockPrice(selectedStock.symbol)
   // )
+  setUsdtBalance(getUserBalance('USDC'))
+  setStockBalance(getUserBalance(selectedStock.symbol))
   setMaxAmount(
     side === 'buy' 
-    ?  Number(getUserBalance('USDT').balance) / getStockPrice(selectedStock.symbol)
+    ?  Number(getUserBalance('USDC').balance) / getStockPrice(selectedStock.symbol)
     : Number(getUserBalance(selectedStock.symbol).balance)
   )
-}, [state]);
+  setTotalCost(
+    side === 'buy' ?
+    (parseFloat(amount || '0') * getStockPrice(selectedStock.symbol))
+    :
+    Number(getUserBalance(selectedStock.symbol).balance)*getStockPrice(selectedStock.symbol)
+  )
+
+  console.log(
+    `Current Information ::
+    Balance :: ${Number(getUserBalance('USDC').balance)}
+    Stocks :: ${selectedStock.symbol}
+    Stocks Balance :: ${Number(getUserBalance(selectedStock.symbol).balance)}
+    `
+    
+  )
+}, [state,amount,side,activeTab]);
 
   const handleTrade = async () => {
     
@@ -101,32 +118,55 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
         });
       } else {
         // Spot trade
-        const amtUsd = (Number(amount) * getStockPrice(selectedStock.symbol) * 1e6).toFixed(0)
+        let amtUsd = (Number(amount) * getStockPrice(selectedStock.symbol) * 1e6).toFixed(0)
+        if(Number(amtUsd) > Number(getUserBalance('USDC').balance)*1e6)
+        {
+          amtUsd = Number(getUserBalance('USDC').balance*1e6).toFixed(0)
+        }
+        let amtToken = (Number(amount)*1e8).toFixed(0)
+        if(Number(amtToken) > Number(getUserBalance(selectedStock.symbol).balance)*1e8)
+        {
+          amtToken = Number(getUserBalance(selectedStock.symbol).balance * 1e8).toFixed(0)
+        }
         if( orderType == "market")
         {
-          console.log("Trade info ::",
+          if(side == "buy")
+          {
+            let txn;
+            if(state.wallet.sk.length>10)
             {
-              amount,
-              selectedStock,
+              //Local wallet
+              txn = await spotBuy(selectedStock.address,state.wallet.address,amtUsd,sendTx,state);
+            }else{
+              //external wallet
+              txn = await spotBuy(selectedStock.address,state.wallet.address,amtUsd,sendTransaction,state);
             }
-          )
-          let txn;
-          if(state.wallet.sk.length>10)
-          {
-            //Local wallet
-            txn = await spotBuy(selectedStock.address,state.wallet.address,amtUsd,sendTx,state);
-          }else{
-            //external wallet
-            txn = await spotBuy(selectedStock.address,state.wallet.address,amtUsd,sendTransaction,state);
+            if(txn)
+            {
+              toast.success(`🚀 Transaction Confirm ${txn}`, {
+                icon:'💰'
+              });
+            }
           }
-          
-          console.log(txn)
-          if(txn)
+          if(side == "sell")
           {
-            toast.success(`🚀 Transaction Confirm ${txn}`, {
-              icon: side === 'buy' ? '💰' : '💸'
-            });
+            let txn;
+            if(state.wallet.sk.length>10)
+            {
+              //Local wallet
+              txn = await spotSell(selectedStock.address,state.wallet.address,amtToken,sendTx,state);
+            }else{
+              //external wallet
+              txn = await spotSell(selectedStock.address,state.wallet.address,amtToken,sendTransaction,state);
+            }
+            if(txn)
+            {
+              toast.success(`🚀 Transaction Confirm ${txn}`, {
+                icon:'💸' 
+              });
+            }
           }
+
 
         }
 
@@ -284,7 +324,7 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
               </button>
             </div>
             <div className="flex justify-between text-xs text-purple-400">
-              <span>Available: {maxAmount.toFixed(4)} {side === 'buy' ? selectedStock.symbol : 'USDT'}</span>
+              <span>Available: {maxAmount.toFixed(4)} {side === 'buy' ? selectedStock.symbol : 'USDC'}</span>
               <span>≈ {formatCurrency(totalCost)}</span>
             </div>
           </div>
@@ -292,7 +332,7 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
           {/* Limit Price for Limit Orders */}
           {orderType === 'limit' && (
             <div className="space-y-2">
-              <label className="text-sm text-purple-200">Limit Price (USDT)</label>
+              <label className="text-sm text-purple-200">Limit Price (USDC)</label>
               <input
                 type="number"
                 value={limitPrice}

@@ -130,6 +130,13 @@ export const mockUserBalances: UserBalance[] = [
     usdValue: 15750.25,
     locked: 2500.00
   },
+
+  {
+    asset: 'USDC',
+    balance: 0,
+    usdValue: 0,
+    locked: 0
+  },
   {
     asset: 'TSLA',
     balance: 12.5,
