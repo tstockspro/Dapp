@@ -74,6 +74,19 @@ async function requester(url: string, requestOptions: any) {
     }
   }
 
+
+  async function api_account_info(address:string) {
+    try {
+      return await requester(
+        `${config.api.tstocks.baseUrl}${config.api.tstocks.router.info}/${address}`,
+        request_get_unauth(),
+      );
+    } catch (e) {
+      console.error(e);
+  
+      return 0;
+    }
+  }
   async function api_spot_buy(mint:string,address:string,amount:string) {
     try {
       return await requester(
@@ -117,5 +130,6 @@ async function requester(url: string, requestOptions: any) {
     api_token_price,
     api_spot_buy,
     api_spot_sell,
-    api_margin_buy
+    api_margin_buy,
+    api_account_info
   }

@@ -39,6 +39,8 @@ interface AppState {
   
   // Real-time updates
   priceUpdates: Record<string, number>;
+  history: any[];
+  historyCount : number;
 }
 
 type AppAction =
@@ -50,6 +52,7 @@ type AppAction =
   | { type: 'UPDATE_BALANCE'; payload: UserBalance }
   | { type: 'ADD_POSITION'; payload: Position }
   | { type: 'UPDATE_POSITION'; payload: Position }
+  | { type: 'UPDATE_HISTORY'; payload: { history:any[],historyCount:number } }
   | { type: 'CLOSE_POSITION'; payload: string }
   | { type: 'ADD_ORDER'; payload: TradeOrder }
   | { type: 'UPDATE_ORDER'; payload: TradeOrder }
@@ -61,12 +64,14 @@ const initialState: AppState = {
   wallet: null,
   stocks: mockStocks,
   balances: mockUserBalances,
-  positions: mockPositions,
+  positions: [],//mockPositions,
   lpTokens: mockLPTokens,
   orders: [],
   loading: false,
   error: null,
-  priceUpdates: {}
+  priceUpdates: {},
+  history: [],
+  historyCount : 0
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -134,6 +139,13 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         positions: state.positions.filter(position => position.id !== action.payload)
       };
     
+
+    case 'UPDATE_HISTORY':
+      return {
+        ...state,
+        history: state.history,
+        historyCount : state.historyCount
+      };
     case 'ADD_ORDER':
       return {
         ...state,
@@ -181,7 +193,9 @@ interface AppContextType {
   getStockPrice: (symbol: string) => number;
   getUserBalance: (asset: string) => UserBalance | undefined;
   getTotalPortfolioValue: () => number;
-  updateStockInfo:(info:any)=> void
+  updateStockInfo:(info:any)=> void;
+  anyDispatch:(type:string,data:any) => void;
+  getTokenByMint: (mint: string) => Stock | undefined;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -268,6 +282,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return state.balances.find(balance => balance.asset === asset);
   };
 
+  const getTokenByMint = (mint:string): Stock | undefined =>
+  {
+    return state.stocks.find(stocks => stocks.address == mint)
+  }
   const getTotalPortfolioValue = (): number => {
     return state.balances.reduce((total, balance) => total + balance.usdValue, 0);
   };
@@ -285,6 +303,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         });
   };
 
+  const anyDispatch = (type:string,e:any) => {
+        dispatch({
+          type: (type as any),
+          payload: e
+        });
+  };
+
 
   const contextValue: AppContextType = {
     state,
@@ -298,7 +323,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     getUserBalance,
     getTotalPortfolioValue,
     updateBalance,
-    updateStockInfo
+    updateStockInfo,
+    anyDispatch,
+    getTokenByMint
   };
 
   return (

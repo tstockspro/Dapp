@@ -10,9 +10,9 @@ import { copyToClipboard, generateWalletAddress } from '../../utils/wallet';
 import toast from 'react-hot-toast';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { initBalanace } from '@/core/wallet';
+import { getAccountInfo, initBalanace } from '@/core/wallet';
 export const WalletConnectLocal: React.FC = () => {
-  const { state, connectWallet, disconnectWallet ,connectExtensionWallet,updateBalance,updateStockInfo} = useApp();
+  const { state, connectWallet, disconnectWallet ,connectExtensionWallet,updateBalance,updateStockInfo ,createPosition ,anyDispatch} = useApp();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const { setVisible } = useWalletModal()
@@ -36,6 +36,22 @@ export const WalletConnectLocal: React.FC = () => {
       info.price.forEach(e => {
         updateStockInfo(e)
       });
+    }
+    const _state = JSON.parse(
+      JSON.stringify(state)
+    );
+    
+    const accountInfo = await getAccountInfo((wallet as any)?.address , state ,(info as any)?.price);
+    console.log("accountInfo",accountInfo)
+    if(accountInfo)
+    {
+      for(let i of accountInfo.positions)
+      {
+        createPosition(i);
+      }
+
+      anyDispatch("UPDATE_HISTORY",{history:accountInfo.hisotry,historyCount:accountInfo.count})
+      
     }
     // dispatch({type: 'SET_LOADING',payload: false});
     // console.log("final state :: ",state)

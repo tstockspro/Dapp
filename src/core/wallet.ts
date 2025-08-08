@@ -5,7 +5,8 @@ import { Buffer } from 'buffer';
 import { ASSOCIATED_TOKEN_PROGRAM_ID, getAccount, getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import config from './config';
 import { mockStocks } from '@/data/mockData';
-import { api_token_price } from './api';
+import { api_account_info, api_spot_sell, api_token_price } from './api';
+import { Position } from '@/types';
 const connection = new Connection( (import.meta as any).env.VITE_RPC, 'confirmed');
 
 const restoreSolanaWallet = (seed: string) =>{
@@ -253,6 +254,78 @@ async function initBalanace(address: string) {
   };
 }
 
+async function getAccountInfo(address:string,state:any,price:any) {
+  const d = await api_account_info(address);
+  if(d&&d.data)
+  {
+    let ret = {
+      positions:[],
+      hisotry:[],
+      count:d.data.count,
+    };
+    if(d.data.positions?.length>0)
+    {
+          d.data.positions.forEach(e => {
+          const s = state.stocks.find(stocks => stocks.address == e.mint)
+          const ps = price.find(price => price.symbol == s?.symbol)
+          if(s && ps)
+          {
+            const size = (Number(e.amountOut)/1e8)
+            const entryPrice= (Number(e.amountIn)*1e2)/(Number(e.amountOut));
+            const leverage= Number((Number(e.amountIn)/Number(e.margin)).toFixed(1));
+            const pnl = (size*ps.price*1e6 - Number(e.amountIn))/1e6
+            const pnlPercent =Number(( pnl*100 / Number(e.amountIn)).toFixed(3))
+            const liquidationPrice = (Number(e.amountIn) - Number(e.margin)) / (Number(e.amountOut)/100)
+            ret.positions.push(
+              {
+                id: e.hash,
+                symbol: s.symbol,
+                type: e.direction == "open" ?"long" :"short",
+                size: Number(size.toFixed(6)),
+                entryPrice:entryPrice,
+                currentPrice: ps.price,
+                leverage: leverage,
+                pnl: pnl,
+                pnlPercent: pnlPercent,
+                margin: (Number(e.margin)/1e6),
+                liquidationPrice: liquidationPrice,
+                timestamp:e.timestamp,
+                status: 'open'
+              } as Position
+            )
+          }
+        });
+    }
+
+    if(d.data.hisotry?.length>0)
+    {
+      d.data.hisotry.forEach(e => {
+          const s = state.stocks.find(stocks => stocks.address == e.mint)
+          if(s)
+          {
+          ret.hisotry.push(
+            {
+              id: e.hash,
+              symbol: s.symbol,
+              type: e.direction,
+              amountIn:e.amountIn,
+              amountOut:e.amountOut,
+              entryPrice: e.direction == "sell" ? (Number(e.amountIn)/Number(e.amountOut)).toFixed(0) :(Number(e.amountOut)/Number(e.amountIn)).toFixed(0) ,
+              currentPrice: 0,
+              logo:s.logo,
+              timestamp:e.timestamp,
+            }
+          )
+        }
+      });
+    }
+
+
+    return ret;
+  }
+  return false;
+}
+
 export {
     connection,
     restoreSolanaWallet,
@@ -264,5 +337,6 @@ export {
     getSplBalance,
     initBalanace,
     getTokenPrice,
-    sendTx
+    sendTx,
+    getAccountInfo
 }

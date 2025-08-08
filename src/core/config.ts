@@ -16,7 +16,8 @@ const config = {
                 margin:{
                     buy:"buy/margin",
                     sell:"sell/margin",
-                }
+                },
+                info:"info"
             }
         },
         jup:{
