@@ -126,10 +126,24 @@ async function requester(url: string, requestOptions: any) {
       return 0;
     }
   }
+
+    async function api_margin_close(hash:string) {
+    try {
+      return await requester(
+        `${config.api.tstocks.baseUrl}${config.api.tstocks.router.margin.sell}`,
+        request_post_unauth({hash}),
+      );
+    } catch (e) {
+      console.error(e);
+  
+      return 0;
+    }
+  }
   export {
     api_token_price,
     api_spot_buy,
     api_spot_sell,
     api_margin_buy,
-    api_account_info
+    api_account_info,
+    api_margin_close
   }

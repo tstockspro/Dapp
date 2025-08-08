@@ -1,5 +1,5 @@
 import { VersionedTransaction } from "@solana/web3.js";
-import { api_margin_buy, api_spot_buy, api_spot_sell } from "./api"
+import { api_margin_buy, api_spot_buy, api_spot_sell ,api_margin_close} from "./api"
 import { connection } from "./wallet";
 
 const spotBuy = async(mint:string,address:string,amount:string,sendTx:any,state:any) =>
@@ -86,8 +86,38 @@ const marginBuy = async(mint:string,address:string,margin:string,amount:string,s
 
     return tx;
 }
+
+
+const marginClose = async(hash:string,sendTx:any,state:any) =>
+{
+    let tx = false;
+    try{
+        const txn = await api_margin_close(hash)
+        console.log(txn)
+        if(txn && txn?.data)
+        {
+            const txs = VersionedTransaction.deserialize(
+                Buffer.from(txn.data,"base64")
+            )
+            console.log(txs)
+            if(state.wallet.sk.length>10)
+            {
+                tx = await sendTx(state.wallet.sk,txs)
+            }else{
+                tx = await sendTx(txs,connection)
+            }
+            
+        }
+    }catch(e)
+    {
+        console.error(e);
+    }
+
+    return tx;
+}
 export {
     spotBuy,
     spotSell,
-    marginBuy
+    marginBuy,
+    marginClose
 }

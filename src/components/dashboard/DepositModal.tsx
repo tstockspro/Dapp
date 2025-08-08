@@ -8,6 +8,7 @@ import { mockDepositMethods } from '../../data/mockData';
 import { generateQRCode, copyToClipboard, generateWalletAddress } from '../../utils/wallet';
 import { formatCurrency } from '../../utils/formatters';
 import toast from 'react-hot-toast';
+import { useApp } from '@/context/AppContext';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface DepositModalProps {
 }
 
 export const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
+  const { state } = useApp();
   const [selectedMethod, setSelectedMethod] = useState(mockDepositMethods[0]);
   const [depositAddress, setDepositAddress] = useState('');
   const [qrCode, setQrCode] = useState('');
@@ -32,7 +34,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) =
     
     try {
       // Generate address based on network
-      const address = generateWalletAddress(selectedMethod.network);
+      const address = generateWalletAddress(selectedMethod.network , state);
       setDepositAddress(address);
       
       // Generate QR code

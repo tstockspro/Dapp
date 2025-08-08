@@ -7,17 +7,34 @@ import { GlassCard } from '../common/GlassCard';
 import { Button } from '../common/Button';
 import { formatCurrency, formatPercent, formatTimeAgo, formatLeverage } from '../../utils/formatters';
 import toast from 'react-hot-toast';
-
+import { marginClose } from '@/core/trade';
+import { sendTx } from '@/core/wallet';
+import { useWallet } from '@solana/wallet-adapter-react';
 export const PositionsTable: React.FC = () => {
   const { state, closePosition } = useApp();
   const [closingPosition, setClosingPosition] = useState<string | null>(null);
-
+  const { sendTransaction } = useWallet()
   const handleClosePosition = async (positionId: string) => {
     setClosingPosition(positionId);
     
     try {
       // Simulate position closing
-      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      let txn;
+      if(state.wallet.sk.length>10)
+      {
+        //Local wallet
+        txn = await marginClose(positionId,sendTx,state);
+      }else{
+        //external wallet
+        txn = await marginClose(positionId,sendTransaction,state);
+      }
+      if(txn)
+      {
+        toast.success(`${txn}`, {
+          icon:''
+        });
+      }
       
       closePosition(positionId);
       toast.success('Position closed successfully!', {

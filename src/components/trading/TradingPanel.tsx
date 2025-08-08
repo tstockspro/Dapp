@@ -128,8 +128,8 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             }
             if(txn)
             {
-              toast.success(`🚀 Transaction Confirm ${txn}`, {
-                icon:'💰'
+              toast.success(`${txn}`, {
+                icon:''
               });
             }
         }
@@ -164,8 +164,8 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             }
             if(txn)
             {
-              toast.success(`🚀 Transaction Confirm ${txn}`, {
-                icon:'💰'
+              toast.success(`${txn}`, {
+                icon:''
               });
             }
           }
@@ -182,8 +182,8 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             }
             if(txn)
             {
-              toast.success(`🚀 Transaction Confirm ${txn}`, {
-                icon:'💸' 
+              toast.success(`${txn}`, {
+                icon:'' 
               });
             }
           }

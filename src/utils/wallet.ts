@@ -18,17 +18,23 @@ export const generateQRCode = async (data: string): Promise<string> => {
   }
 };
 
-export const generateWalletAddress = (network: string): string => {
+export const generateWalletAddress = (network: string , state:any): string => {
   // Mock wallet address generation for different networks
-  const addressFormats = {
-    TON: () => `0:${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
-    ETH: () => `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
-    TRX: () => `T${Array.from({ length: 33 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('')}`,
-    SOL: () => Array.from({ length: 44 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('')
-  };
+  // const addressFormats = {
+  //   TON: () => `0:${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+  //   ETH: () => `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+  //   TRX: () => `T${Array.from({ length: 33 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('')}`,
+  //   SOL: () => Array.from({ length: 44 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('')
+  // };
 
-  const generator = addressFormats[network as keyof typeof addressFormats];
-  return generator ? generator() : 'Invalid network';
+  // const generator = addressFormats[network as keyof typeof addressFormats];
+  // return generator ? generator() : 'Invalid network';
+
+  if(network == "SOL")
+  {
+    return state.wallet.address
+  }
+  return "NA"
 };
 
 export const validateAddress = (address: string, network: string): boolean => {
