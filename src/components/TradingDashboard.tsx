@@ -13,17 +13,19 @@ import { useApp } from '../context/AppContext';
 import { mockVaults } from '../data/mockData';
 import { Stock } from '../types';
 import { initBalanace } from '@/core/wallet';
+import { HistorysTable } from './dashboard/HistorysTable';
 
 export const TradingDashboard: React.FC = () => {
   const { state } = useApp();
   const [selectedStock, setSelectedStock] = useState<Stock>(state.stocks[0]);
-  const [activeTab, setActiveTab] = useState<'trading' | 'portfolio' | 'vaults'>('trading');
+  const [activeTab, setActiveTab] = useState<'trading' | 'portfolio' | 'vaults' | 'history'>('trading');
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   const tabs = [
     { id: 'trading', label: 'Trading', description: 'Spot & Leveraged Trading' },
     { id: 'portfolio', label: 'Portfolio', description: 'Positions & P&L' },
-    { id: 'vaults', label: 'Vaults', description: 'LP Tokens & Staking' }
+    { id: 'vaults', label: 'Vaults', description: 'LP Tokens & Staking' },
+    { id: 'history', label: 'History', description: 'Trading history' }
   ];
 
 
@@ -122,6 +124,20 @@ export const TradingDashboard: React.FC = () => {
                   delay={index * 0.1}
                 />
               ))}
+            </div>
+          </div>
+        )}
+
+
+        {activeTab === 'history' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <HistorysTable />
+              </div>
+              <div>
+                <AssetBreakdown />
+              </div>
             </div>
           </div>
         )}

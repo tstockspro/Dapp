@@ -165,10 +165,10 @@ async function getSplBalance(mint:string ,address: string,decimals:number): Prom
   const ata = await getAssociatedTokenAddress(tokenMint, owner);
   try {
     const accountInfo = await getAccount(connection, ata);
-    console.log("mint:",mint,accountInfo.amount,Number(accountInfo.amount) / Math.pow(10,decimals))
+    // console.log("mint:",mint,accountInfo.amount,Number(accountInfo.amount) / Math.pow(10,decimals))
     return Number(accountInfo.amount) / Math.pow(10,decimals);
   } catch (err) {
-    console.error("mint:",mint,err)
+    // console.error("mint:",mint,err)
     return 0; 
   }
 }
@@ -180,7 +180,6 @@ async function getSpl2022Balance(
   const owner = new PublicKey(address);
   const tokenMint = new PublicKey(mint);
 
-  // 获取 ATA
   const ata = await getAssociatedTokenAddress(
     tokenMint, 
     owner,
@@ -190,13 +189,12 @@ async function getSpl2022Balance(
   );
 
   try {
-    // 获取账户信息（指定 tokenProgramId）
     const accountInfo = await getAccount(connection, ata, undefined, TOKEN_2022_PROGRAM_ID);
     const balance = Number(accountInfo.amount) / (10 ** decimals);
-    console.log("mint:", mint, "raw:", accountInfo.amount.toString(), "balance:", balance);
+    // console.log("mint:", mint, "raw:", accountInfo.amount.toString(), "balance:", balance);
     return balance;
   } catch (err) {
-    console.error("mint:", mint, err);
+    // console.error("mint:", mint, err);
     return 0;
   }
 }

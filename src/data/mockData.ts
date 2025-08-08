@@ -125,14 +125,13 @@ export const mockTradingPairs: TradingPair[] = [
 
 export const mockUserBalances: UserBalance[] = [
   {
-    asset: 'USDT',
-    balance: 15750.25,
-    usdValue: 15750.25,
-    locked: 2500.00
-  },
-
-  {
     asset: 'USDC',
+    balance: 0,
+    usdValue: 0,
+    locked: 0
+  },
+  {
+    asset: 'USDT',
     balance: 0,
     usdValue: 0,
     locked: 0
