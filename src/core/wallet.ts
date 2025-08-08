@@ -319,19 +319,39 @@ async function getAccountInfo(address:string,state:any,price:any) {
           // console.log("s,ps,",s,ps)
           if(s && ps)
           {
-          ret.history.push(
+            if(e.type == "spot")
             {
-              id: e.hash,
-              symbol: s.symbol,
-              type: e.direction,
-              amountToken: e.direction == "sell" ? e.amountOut : e.amountIn,
-              amountOut:e.direction == "sell" ? e.amountIn : e.amountOut,
-              entryPrice: e.direction == "sell" ? (Number(e.amountIn)/Number(e.amountOut)).toFixed(0) :(Number(e.amountOut)/Number(e.amountIn)).toFixed(0) ,
-              currentPrice: ps.price,
-              logo:s.logo,
-              timestamp:e.timestamp,
+                ret.history.push(
+                  {
+                    id: e.hash,
+                    symbol: s.symbol,
+                    type: e.direction,
+                    amountToken: e.direction == "sell" ? Number(e.amountOut)/1e8 : Number(e.amountIn)/1e8,
+                    amountOut:e.direction == "sell" ? e.amountIn : e.amountOut,
+                    entryPrice: e.direction == "sell" ? (Number(e.amountIn)/Number(e.amountOut)).toFixed(0) :(Number(e.amountOut)/Number(e.amountIn)).toFixed(0) ,
+                    currentPrice: ps.price,
+                    logo:s.logo,
+                    timestamp:e.timestamp,
+                  }
+                )
+            }else{
+                   
+              // console.log((Number(e.amountIn)*100/Number(e.amountOut)).toFixed(3))
+                  ret.history.push(
+                  {
+                    id: e.hash,
+                    symbol: s.symbol,
+                    type: "CLOSE",
+                    amountToken:Number(e.amountOut)/1e8, 
+                    amountOut:e.amountIn,
+                    entryPrice: (Number(e.amountIn)*100/Number(e.amountOut)).toFixed(3),
+                    currentPrice: ps.price,
+                    logo:s.logo,
+                    timestamp:e.timestamp,
+                  }
+                )
             }
-          )
+
         }
       });
     }

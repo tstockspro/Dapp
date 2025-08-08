@@ -67,7 +67,7 @@ export const WalletConnectLocal: React.FC = () => {
 
     const interval = setInterval(() => {
       init()
-    }, 30000); // 30s
+    }, 150000); // 30s
 
     return () => clearInterval(interval);
 

@@ -32,7 +32,11 @@ export const PositionsTable: React.FC = () => {
       if(txn)
       {
         toast.success(`${txn}`, {
-          icon:''
+                style: {
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  maxWidth: '400px'
+                }
         });
       }
       

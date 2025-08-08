@@ -129,7 +129,11 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             if(txn)
             {
               toast.success(`${txn}`, {
-                icon:''
+                style: {
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  maxWidth: '400px'
+                }
               });
             }
         }
@@ -165,7 +169,11 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             if(txn)
             {
               toast.success(`${txn}`, {
-                icon:''
+                style: {
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  maxWidth: '400px'
+                }
               });
             }
           }
@@ -183,7 +191,11 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             if(txn)
             {
               toast.success(`${txn}`, {
-                icon:'' 
+                style: {
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  maxWidth: '400px'
+                }
               });
             }
           }
