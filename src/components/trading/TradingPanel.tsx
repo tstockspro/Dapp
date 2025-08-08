@@ -9,7 +9,7 @@ import { Button } from '../common/Button';
 import { formatCurrency, formatPercent, generatePositionId } from '../../utils/formatters';
 import { calculatePnL } from '../../utils/formatters';
 import toast from 'react-hot-toast';
-import { spotBuy, spotSell } from '@/core/trade';
+import { marginBuy, spotBuy, spotSell } from '@/core/trade';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { sendTx } from '@/core/wallet';
 
@@ -58,14 +58,13 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
     Number(getUserBalance(selectedStock.symbol).balance)*getStockPrice(selectedStock.symbol)
   )
 
-  console.log(
-    `Current Information ::
-    Balance :: ${Number(getUserBalance('USDC').balance)}
-    Stocks :: ${selectedStock.symbol}
-    Stocks Balance :: ${Number(getUserBalance(selectedStock.symbol).balance)}
-    `
-    
-  )
+  // console.log(
+  //   `Current Information ::
+  //   Balance :: ${Number(getUserBalance('USDC').balance)}
+  //   Stocks :: ${selectedStock.symbol}
+  //   Stocks Balance :: ${Number(getUserBalance(selectedStock.symbol).balance)}
+  //   `
+  // )
 }, [state,amount,side,activeTab]);
 
   const handleTrade = async () => {
@@ -112,7 +111,29 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
           status: 'open' as const
         };
 
-        createPosition(position);
+        if(position.type == "long")
+        {
+            let amtUsd = (Number(amount) * getStockPrice(selectedStock.symbol) * 1e6).toFixed(0)
+            let amtMargin = (Number(amtUsd)/Number(leverage)).toFixed(0)
+          //Try make long
+          console.log(amount,leverage,amtMargin,amtUsd)
+            let txn;
+            if(state.wallet.sk.length>10)
+            {
+              //Local wallet
+              txn = await marginBuy(selectedStock.address,state.wallet.address,amtMargin,amtUsd,sendTx,state);
+            }else{
+              //external wallet
+              txn = await marginBuy(selectedStock.address,state.wallet.address,amtMargin,amtUsd,sendTransaction,state);
+            }
+            if(txn)
+            {
+              toast.success(`🚀 Transaction Confirm ${txn}`, {
+                icon:'💰'
+              });
+            }
+        }
+        // createPosition(position);
         toast.success(`${activeTab === 'short' ? 'Short' : 'Leveraged'} position opened!`, {
           icon: '🚀'
         });
@@ -375,12 +396,13 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             className="w-full py-4 text-lg font-bold"
             variant={activeTab === 'short' ? 'danger' : activeTab === 'leveraged' ? 'success' : 'primary'}
           >
-            {orderType == "limit" ? "Comming Soon ..." : 
-            activeTab === 'spot' && `${side === 'buy' ? 'Buy' : 'Sell'} ${selectedStock.symbol}`
-          }
+            {orderType == "limit" ? "Comming Soon ..." : null}
+            {activeTab === 'spot' || orderType!="limit" && `${side === 'buy' ? 'Buy' : 'Sell'} ${selectedStock.symbol}`}
             
-            {activeTab === 'leveraged' && `Open Long Position`}
-            {activeTab === 'short' && `Open Short Position`}
+            {activeTab === 'leveraged'|| orderType!="limit" && `Open Long Position`}
+
+            {activeTab === 'short' && `Comming Soon ...`}
+            {/* {activeTab === 'short' && `Open Short Position`} */}
           </Button>
         </div>
       </div>

@@ -201,7 +201,7 @@ async function getSpl2022Balance(
   }
 }
 async function initBalanace(address: string) {
-  console.log("now try get balance ", address);
+  // console.log("now try get balance ", address);
   if (!address) {
     return false;
   }
@@ -248,7 +248,7 @@ async function initBalanace(address: string) {
     };
     ret.push(tmp);
   }
-  console.log(ret)
+  // console.log(ret)
   return {
     price: prices,
     balance: ret
