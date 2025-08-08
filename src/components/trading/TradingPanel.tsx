@@ -397,9 +397,9 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             variant={activeTab === 'short' ? 'danger' : activeTab === 'leveraged' ? 'success' : 'primary'}
           >
             {orderType == "limit" ? "Comming Soon ..." : null}
-            {activeTab === 'spot' || orderType!="limit" && `${side === 'buy' ? 'Buy' : 'Sell'} ${selectedStock.symbol}`}
+            {activeTab === 'spot' && orderType!="limit" && `${side === 'buy' ? 'Buy' : 'Sell'} ${selectedStock.symbol}`}
             
-            {activeTab === 'leveraged'|| orderType!="limit" && `Open Long Position`}
+            {activeTab === 'leveraged'&& orderType!="limit" && `Open Long Position`}
 
             {activeTab === 'short' && `Comming Soon ...`}
             {/* {activeTab === 'short' && `Open Short Position`} */}

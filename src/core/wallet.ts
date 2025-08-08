@@ -151,7 +151,7 @@ async function getTokenPrice(token:string) {
 async function sendTx(sk:string,tx:any) {
   const kp = Keypair.fromSecretKey(bs58.default.decode(sk));
   tx.sign([kp])
-  return await connection.sendRawTransaction(tx)
+  return await connection.sendRawTransaction(tx.serialize())
 }
 
 async function getSolBalance(address: string): Promise<number> {
