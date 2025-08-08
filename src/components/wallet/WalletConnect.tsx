@@ -1,7 +1,7 @@
 // TON Wallet connection component
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, ChevronDown, LogOut, Copy, ExternalLink,ArrowLeftRight } from 'lucide-react';
+import { Wallet, ChevronDown, LogOut, Copy, ExternalLink,ArrowLeftRight , ArrowUp ,Import } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../common/Button';
 import { GlassCard } from '../common/GlassCard';
@@ -10,11 +10,14 @@ import { copyToClipboard, generateWalletAddress } from '../../utils/wallet';
 import toast from 'react-hot-toast';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { getAccountInfo, initBalanace } from '@/core/wallet';
+import { getAccountInfo, importInit, importSkInit, initBalanace } from '@/core/wallet';
 export const WalletConnectLocal: React.FC = () => {
   const { state, connectWallet, disconnectWallet ,connectExtensionWallet,updateBalance,updateStockInfo ,createPosition ,anyDispatch} = useApp();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isExportWallet, setIsExportWallet] = useState(false);
+  const [isImportWallet, setIsImportWallet] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [sk, setSk] = useState("");
   const { setVisible } = useWalletModal()
   const {publicKey, connected, signTransaction,disconnect } = useWallet();
 
@@ -109,6 +112,35 @@ export const WalletConnectLocal: React.FC = () => {
           icon: '📋'
         });
       }
+    }
+  };
+
+  const handleCopySk = async () => {
+    if (state.wallet?.sk) {
+      const success = await copyToClipboard(state.wallet.sk);
+      if (success) {
+        toast.success('Don\' share it to others!', {
+          icon: '⚠'
+        });
+      }
+    }
+  };
+
+  const handleImport = async () => {
+    const res = importSkInit(sk)
+    if(res.secretKey == sk)
+    {
+      //Import successs
+        toast.success('Wallet import success!', {
+          icon: '🍺'
+        });
+        setIsImportWallet(false)
+        await connectWallet()
+        window.location.reload()
+    }else{
+        toast.success('Import failed , Please check your secretKey !', {
+          icon: '❌'
+        });
     }
   };
 
@@ -224,7 +256,7 @@ export const WalletConnectLocal: React.FC = () => {
                       {
                         state.wallet.sk?.length>10 ? 
                         <button
-                          onClick={handleDisconnect}
+                          onClick={()=>{setIsImportWallet(true)}}
                           className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-blue-600/30 hover:bg-blue-500/40 text-blue-200 hover:text-white transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
@@ -236,7 +268,7 @@ export const WalletConnectLocal: React.FC = () => {
                       {
                         state.wallet.sk?.length>10 ? 
                         <button
-                          onClick={handleDisconnect}
+                          onClick={()=>{setIsExportWallet(true)}}
                           className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-red-600/30 hover:bg-red-500/40 text-red-200 hover:text-white transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
@@ -251,6 +283,114 @@ export const WalletConnectLocal: React.FC = () => {
         )}
       </AnimatePresence>
 
+
+      <AnimatePresence>
+        {isExportWallet && (
+          <motion.div
+            className="absolute top-full right-0 mt-2 z-50"
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <GlassCard className="w-80 bg-black" padding="medium">
+              <div className="space-y-4">
+                {/* Wallet Info */}
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Wallet className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-sm text-purple-200 mb-1">My Wallet</p>
+                  <p className="font-mono text-xs text-purple-300 break-all">
+                    {state.wallet.address}
+                  </p>
+                </div>
+
+                {/* Balance */}
+                <div className="bg-purple-800/30 rounded-lg p-4 border border-purple-500/20 break-all">
+                    <span className="text-purple-200 text-sm">{state.wallet.sk}</span>
+                </div>
+
+
+                {/* Actions */}
+                <div className="space-y-2">
+                  <button
+                    onClick={handleCopySk}
+                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-purple-700/30 hover:bg-purple-600/40 text-purple-200 hover:text-white transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                    <span>Copy Secretkey</span>
+                  </button>
+
+                  <button
+                    onClick={()=>{setIsExportWallet(false)}}
+                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-red-700/30 hover:bg-red-600/40 text-red-200 hover:text-white transition-colors"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                    <span>Close</span>
+                  </button>
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+      <AnimatePresence>
+        {isImportWallet && (
+          <motion.div
+            className="absolute top-full right-0 mt-2 z-50"
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <GlassCard className="w-80 bg-black" padding="medium">
+              <div className="space-y-4">
+                {/* Wallet Info */}
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Wallet className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-sm text-purple-200 mb-1">Restore Wallet</p>
+                </div>
+
+                {/* Balance */}
+                <div className="bg-purple-800/30 rounded-lg p-4 border border-purple-500/20 break-all">
+                    {/* <span className="text-purple-200 text-sm">{state.wallet.sk}</span> */}
+                      <input
+                        type="text"
+                        onChange={(e) => setSk(e.target.value)}
+                        placeholder="Restore wallet "
+                        className="w-full px-4 py-3 bg-purple-800/30 border border-purple-500/30 rounded-xl text-white placeholder-purple-400 focus:outline-none focus:border-purple-400 transition-colors"
+                      />
+                </div>
+
+
+                {/* Actions */}
+                <div className="space-y-2">
+                  <button
+                    onClick={handleImport}
+                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-purple-700/30 hover:bg-purple-600/40 text-purple-200 hover:text-white transition-colors"
+                  >
+                    <Import className="w-4 h-4" />
+                    <span>Confirm Import</span>
+                  </button>
+
+                  <button
+                    onClick={()=>{setIsImportWallet(false)}}
+                    className="w-full flex items-center justify-center space-x-2 p-3 rounded-lg bg-red-700/30 hover:bg-red-600/40 text-red-200 hover:text-white transition-colors"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                    <span>Close</span>
+                  </button>
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Click outside to close */}
       {isDropdownOpen && (
         <div 

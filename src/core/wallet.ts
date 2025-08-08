@@ -21,6 +21,15 @@ const restoreSolanaWallet = (seed: string) =>{
     secretKey: bs58.default.encode(keypair.secretKey)
   };
 }
+const restoreSolanaWalletFromSecretKey = (sec: string) =>{
+  const keypair = Keypair.fromSecretKey(bs58.default.decode(sec))
+  return {
+    keypair,
+    publicKey: keypair.publicKey.toBase58(),
+    secretKey: bs58.default.encode(keypair.secretKey)
+  };
+}
+
 
 function randomBytes(length: number): Uint8Array {
   if (length <= 0) {
@@ -36,7 +45,7 @@ const localInit = () =>{
     let seed = getKp();
     if(seed)
     {
-        const kp = restoreSolanaWallet(seed);
+        const kp = restoreSolanaWalletFromSecretKey(seed);
         if(kp)
         {
             return kp
@@ -50,6 +59,11 @@ const localInit = () =>{
 const importInit = (seed: string) =>{
     setKp(seed)
     return restoreSolanaWallet(seed);
+}
+
+const importSkInit = (seed: string) =>{
+    setKp(seed)
+    return restoreSolanaWalletFromSecretKey(seed);
 }
 
 
@@ -333,6 +347,7 @@ export {
     restoreSolanaWallet,
     localInit,
     importInit,
+    importSkInit,
     encrypt,
     decrypt,
     getSolBalance,
@@ -340,5 +355,6 @@ export {
     initBalanace,
     getTokenPrice,
     sendTx,
-    getAccountInfo
+    getAccountInfo,
+    restoreSolanaWalletFromSecretKey
 }

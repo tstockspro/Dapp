@@ -2,7 +2,7 @@ const config = {
     storage:{
         baseTag:"tstocks_",
         router:{
-            sec:"",
+            sec:"keypair",
         }
     },
     api:{
