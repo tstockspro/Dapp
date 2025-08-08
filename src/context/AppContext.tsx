@@ -50,6 +50,7 @@ type AppAction =
   | { type: 'UPDATE_STOCK_PRICE'; payload: { symbol: string; price: number } }
   | { type: 'UPDATE_STOCK_INFO'; payload: { symbol: string; price: number ;change24h: number ; changePercent24h: number ;volume24h:number;marketCap:number;} }
   | { type: 'UPDATE_BALANCE'; payload: UserBalance }
+  | { type: 'CLEAN_POSITION'; payload: any }
   | { type: 'ADD_POSITION'; payload: Position }
   | { type: 'UPDATE_POSITION'; payload: Position }
   | { type: 'UPDATE_HISTORY'; payload: { history:any[],historyCount:number } }
@@ -124,6 +125,11 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state,
         positions: [...state.positions, action.payload]
       };
+    case "CLEAN_POSITION":
+      return {
+        ...state,
+        positions: []
+      };
     
     case 'UPDATE_POSITION':
       return {
@@ -143,8 +149,8 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'UPDATE_HISTORY':
       return {
         ...state,
-        history: state.history,
-        historyCount : state.historyCount
+        history: action.payload.history,
+        historyCount : action.payload.historyCount
       };
     case 'ADD_ORDER':
       return {

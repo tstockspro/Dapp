@@ -45,12 +45,12 @@ export const WalletConnectLocal: React.FC = () => {
     console.log("accountInfo",accountInfo)
     if(accountInfo)
     {
+      anyDispatch("CLEAN_POSITION","")
       for(let i of accountInfo.positions)
       {
         createPosition(i);
       }
-
-      anyDispatch("UPDATE_HISTORY",{history:accountInfo.hisotry,historyCount:accountInfo.count})
+      anyDispatch("UPDATE_HISTORY",{history:accountInfo.history,historyCount:accountInfo.count})
       
     }
     // dispatch({type: 'SET_LOADING',payload: false});

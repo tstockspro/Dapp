@@ -260,7 +260,7 @@ async function getAccountInfo(address:string,state:any,price:any) {
   {
     let ret = {
       positions:[],
-      hisotry:[],
+      history:[],
       count:d.data.count,
     };
     if(d.data.positions?.length>0)
@@ -296,22 +296,24 @@ async function getAccountInfo(address:string,state:any,price:any) {
           }
         });
     }
-
-    if(d.data.hisotry?.length>0)
+    // console.log(d.data.history)
+    if(d.data.history?.length>0)
     {
-      d.data.hisotry.forEach(e => {
+      d.data.history.forEach(e => {
           const s = state.stocks.find(stocks => stocks.address == e.mint)
-          if(s)
+          const ps = price.find(price => price.symbol == s?.symbol)
+          // console.log("s,ps,",s,ps)
+          if(s && ps)
           {
-          ret.hisotry.push(
+          ret.history.push(
             {
               id: e.hash,
               symbol: s.symbol,
               type: e.direction,
-              amountIn:e.amountIn,
-              amountOut:e.amountOut,
+              amountToken: e.direction == "sell" ? e.amountOut : e.amountIn,
+              amountOut:e.direction == "sell" ? e.amountIn : e.amountOut,
               entryPrice: e.direction == "sell" ? (Number(e.amountIn)/Number(e.amountOut)).toFixed(0) :(Number(e.amountOut)/Number(e.amountIn)).toFixed(0) ,
-              currentPrice: 0,
+              currentPrice: ps.price,
               logo:s.logo,
               timestamp:e.timestamp,
             }

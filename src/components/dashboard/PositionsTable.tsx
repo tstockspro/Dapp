@@ -140,7 +140,7 @@ const PositionCard: React.FC<PositionCardProps> = ({ position, onClose, isClosin
           <Button
             variant="outline"
             size="small"
-            onClick={() => window.open(`https://tonscan.org/tx/${position.id}`, '_blank')}
+            onClick={() => window.open(`https://solscan.io/tx/${position.id}`, '_blank')}
           >
             <ExternalLink className="w-4 h-4" />
           </Button>

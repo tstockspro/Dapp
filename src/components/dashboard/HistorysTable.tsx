@@ -7,6 +7,7 @@ import { GlassCard } from '../common/GlassCard';
 import { Button } from '../common/Button';
 import { formatCurrency, formatPercent, formatTimeAgo, formatLeverage } from '../../utils/formatters';
 import toast from 'react-hot-toast';
+import { stat } from 'fs';
 
 export const HistorysTable: React.FC = () => {
   const { state, closePosition } = useApp();
@@ -46,36 +47,34 @@ export const HistorysTable: React.FC = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Hisotry</h2>
+          <h2 className="text-xl font-bold text-white">History</h2>
           <div className="flex items-center space-x-4">
             <div className="text-right">
-              <p className="text-xs text-purple-200">Trade count : </p>
-              <p className={`text-lg font-bold ${
-                unrealizedPnL >= 0 ? 'text-green-400' : 'text-red-400'
-              }`}>
-                {unrealizedPnL >= 0 ? '+' : ''}{formatCurrency(unrealizedPnL)}
+              <p className="text-xs text-purple-200">Total Trade </p>
+              <p className={`text-lg font-bold text-green-400`}>
+                {state.historyCount}
               </p>
             </div>
           </div>
         </div>
 
         {/* Positions List */}
-        {state.positions.length === 0 ? (
+        {state.history.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <TrendingUp className="w-8 h-8 text-purple-400" />
             </div>
-            <p className="text-purple-300 mb-2">No trade history</p>
+            <p className="text-purple-300 mb-2">No trade history </p>
             <p className="text-sm text-purple-400">Start trading to see your history here</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {state.positions.map((position, index) => (
+            {state.history.map((history, index) => (
               <HistoryCard
-                key={position.id}
-                position={position}
-                onClose={() => handleClosePosition(position.id)}
-                isClosing={closingPosition === position.id}
+                key={history.id}
+                history={history}
+                onClose={() => handleClosePosition(history.id)}
+                isClosing={closingPosition === history.id}
                 delay={index * 0.1}
               />
             ))}
@@ -87,17 +86,14 @@ export const HistorysTable: React.FC = () => {
 };
 
 interface HistoryCardProps {
-  position: any;
+  history: any;
   onClose: () => void;
   isClosing: boolean;
   delay: number;
 }
 
-const HistoryCard: React.FC<HistoryCardProps> = ({ position, onClose, isClosing, delay }) => {
-  const isProfit = position.pnl >= 0;
-  const isLong = position.type === 'long';
-  const liquidationRisk = Math.abs(position.currentPrice - position.liquidationPrice) / position.currentPrice < 0.1;
-
+const HistoryCard: React.FC<HistoryCardProps> = ({ history, onClose, isClosing, delay }) => {
+  const isBuy = history.type == "buy" ? true : false
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -109,30 +105,17 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ position, onClose, isClosing,
         {/* Position Info */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            {isLong ? (
-              <TrendingUp className="w-5 h-5 text-green-400" />
-            ) : (
-              <TrendingDown className="w-5 h-5 text-red-400" />
-            )}
-            <span className="font-bold text-white">{position.symbol}</span>
+            <img
+            src={history.logo}
+            className='w-10 h-10'
+            />
+            <span className="font-bold text-white">{history.symbol}</span>
             <span className={`text-xs px-2 py-1 rounded-full ${
-              isLong ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'
+              isBuy ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'
             }`}>
-              {position.type.toUpperCase()}
+              {history.type.toUpperCase()}
             </span>
-            {position.leverage > 1 && (
-              <span className="text-xs px-2 py-1 rounded-full bg-purple-600/20 text-purple-400">
-                {formatLeverage(position.leverage)}
-              </span>
-            )}
           </div>
-          
-          {liquidationRisk && (
-            <div className="flex items-center space-x-1 text-yellow-400">
-              <AlertTriangle className="w-4 h-4" />
-              <span className="text-xs">High Risk</span>
-            </div>
-          )}
         </div>
 
         {/* Actions */}
@@ -140,74 +123,42 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ position, onClose, isClosing,
           <Button
             variant="outline"
             size="small"
-            onClick={() => window.open(`https://tonscan.org/tx/${position.id}`, '_blank')}
+            onClick={() => window.open(`https://solscan.io/tx/${history.id}`, '_blank')}
           >
             <ExternalLink className="w-4 h-4" />
           </Button>
           
-          <Button
-            variant="danger"
-            size="small"
-            onClick={onClose}
-            loading={isClosing}
-            disabled={isClosing}
-          >
-            <X className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
       {/* Position Details */}
-      <div className="mt-4 grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         <div>
           <p className="text-purple-400">Size</p>
-          <p className="text-white font-medium">{position.size} {position.symbol}</p>
+          <p className="text-white font-medium">{history.amountToken} {history.symbol}</p>
         </div>
         
         <div>
           <p className="text-purple-400">Entry Price</p>
-          <p className="text-white font-medium">{formatCurrency(position.entryPrice)}</p>
+          <p className="text-white font-medium">{formatCurrency(history.entryPrice)}</p>
         </div>
         
         <div>
           <p className="text-purple-400">Current Price</p>
-          <p className="text-white font-medium">{formatCurrency(position.currentPrice)}</p>
+          <p className="text-white font-medium">{formatCurrency(history.currentPrice)}</p>
         </div>
-        
-        <div>
-          <p className="text-purple-400">P&L</p>
-          <div className={`font-bold ${
-            isProfit ? 'text-green-400' : 'text-red-400'
-          }`}>
-            <p>{formatCurrency(position.pnl)}</p>
-            <p className="text-xs">{formatPercent(position.pnlPercent)}</p>
-          </div>
-        </div>
-        
-        <div>
-          <p className="text-purple-400">Margin</p>
-          <p className="text-white font-medium">{formatCurrency(position.margin)}</p>
-        </div>
-        
-        <div>
-          <p className="text-purple-400">Liquidation</p>
-          <p className={`font-medium ${
-            liquidationRisk ? 'text-yellow-400' : 'text-purple-300'
-          }`}>
-            {formatCurrency(position.liquidationPrice)}
-          </p>
-        </div>
+      
       </div>
       
       {/* Time */}
       <div className="mt-3 flex justify-between items-center text-xs text-purple-400">
-        <span>Opened {formatTimeAgo(position.timestamp)}</span>
+        <span>Opened {formatTimeAgo(history.timestamp)}</span>
         <span className={`px-2 py-1 rounded-full ${
-          position.status === 'open' 
+          history.type === 'open' 
             ? 'bg-green-600/20 text-green-400' 
             : 'bg-gray-600/20 text-gray-400'
         }`}>
-          {position.status.toUpperCase()}
+          {history.type.toUpperCase()}
         </span>
       </div>
     </motion.div>
