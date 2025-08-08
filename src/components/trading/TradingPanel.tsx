@@ -1,5 +1,5 @@
 // Main trading panel with buy/sell functionality
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown, BarChart3, Zap, Shield } from 'lucide-react';
 import { Stock } from '../../types';
@@ -9,13 +9,16 @@ import { Button } from '../common/Button';
 import { formatCurrency, formatPercent, generatePositionId } from '../../utils/formatters';
 import { calculatePnL } from '../../utils/formatters';
 import toast from 'react-hot-toast';
+import { spotBuy } from '@/core/trade';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { sendTx } from '@/core/wallet';
 
 interface TradingPanelProps {
   selectedStock: Stock;
 }
 
 export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => {
-  const { state, createPosition, getUserBalance } = useApp();
+  const { state, createPosition, getUserBalance,getStockPrice } = useApp();
   const [activeTab, setActiveTab] = useState<'spot' | 'leveraged' | 'short'>('spot');
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market');
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
@@ -23,18 +26,34 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
   const [leverage, setLeverage] = useState(2);
   const [limitPrice, setLimitPrice] = useState('');
   const [isTrading, setIsTrading] = useState(false);
+  const { sendTransaction } = useWallet()
 
   const usdtBalance = getUserBalance('USDT');
   const stockBalance = getUserBalance(selectedStock.symbol);
   
-  const maxAmount = side === 'buy' 
-    ? (usdtBalance?.balance || 0) / selectedStock.price
-    : (stockBalance?.balance || 0);
+  const [maxAmount, setMaxAmount] = useState(
+    side === 'buy' 
+    ?  Number(getUserBalance('USDT').balance) / getStockPrice(selectedStock.symbol)
+    : Number(getUserBalance(selectedStock.symbol).balance)
+  );
 
   const totalCost = parseFloat(amount || '0') * selectedStock.price;
   const leveragedAmount = activeTab === 'leveraged' ? totalCost * leverage : totalCost;
 
+  useEffect(() => {
+  // console.log(
+  //   "Trading Panel ::",getUserBalance('USDT'),getUserBalance(selectedStock.symbol),getStockPrice(selectedStock.symbol)
+  // )
+  setMaxAmount(
+    side === 'buy' 
+    ?  Number(getUserBalance('USDT').balance) / getStockPrice(selectedStock.symbol)
+    : Number(getUserBalance(selectedStock.symbol).balance)
+  )
+}, [state]);
+
   const handleTrade = async () => {
+    
+
     if (!state.wallet) {
       toast.error('Please connect your wallet first');
       return;
@@ -82,11 +101,44 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
         });
       } else {
         // Spot trade
+        const amtUsd = (Number(amount) * getStockPrice(selectedStock.symbol) * 1e6).toFixed(0)
+        if( orderType == "market")
+        {
+          console.log("Trade info ::",
+            {
+              amount,
+              selectedStock,
+            }
+          )
+          let txn;
+          if(state.wallet.sk.length>10)
+          {
+            //Local wallet
+            txn = await spotBuy(selectedStock.address,state.wallet.address,amtUsd,sendTx,state);
+          }else{
+            //external wallet
+            txn = await spotBuy(selectedStock.address,state.wallet.address,amtUsd,sendTransaction,state);
+          }
+          
+          console.log(txn)
+          if(txn)
+          {
+            toast.success(`🚀 Transaction Confirm ${txn}`, {
+              icon: side === 'buy' ? '💰' : '💸'
+            });
+          }
+
+        }
+
+        if( orderType == "limit")
+        {
+          //Limit order 
+        }
+
         toast.success(`${side === 'buy' ? 'Bought' : 'Sold'} ${amount} ${selectedStock.symbol}!`, {
           icon: side === 'buy' ? '💰' : '💸'
         });
       }
-
       setAmount('');
     } catch (error) {
       toast.error('Trade failed. Please try again.');
@@ -283,7 +335,10 @@ export const TradingPanel: React.FC<TradingPanelProps> = ({ selectedStock }) => 
             className="w-full py-4 text-lg font-bold"
             variant={activeTab === 'short' ? 'danger' : activeTab === 'leveraged' ? 'success' : 'primary'}
           >
-            {activeTab === 'spot' && `${side === 'buy' ? 'Buy' : 'Sell'} ${selectedStock.symbol}`}
+            {orderType == "limit" ? "Comming Soon ..." : 
+            activeTab === 'spot' && `${side === 'buy' ? 'Buy' : 'Sell'} ${selectedStock.symbol}`
+          }
+            
             {activeTab === 'leveraged' && `Open Long Position`}
             {activeTab === 'short' && `Open Short Position`}
           </Button>

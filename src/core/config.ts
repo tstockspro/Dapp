@@ -6,6 +6,19 @@ const config = {
         }
     },
     api:{
+        tstocks:{
+            baseUrl:"https://api.tstocks.pro/",
+            router:{
+                spot:{
+                    buy:"buy/spot",
+                    sell:"sell/spot",
+                },
+                margin:{
+                    buy:"buy/margin",
+                    sell:"sell/margin",
+                }
+            }
+        },
         jup:{
             liteUrl:"https://lite-api.jup.ag/",
             price:"price/v3"

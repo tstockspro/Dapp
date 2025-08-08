@@ -146,6 +146,13 @@ async function getTokenPrice(token:string) {
   }
   return ret;
 }
+
+async function sendTx(sk:string,tx:any) {
+  const kp = Keypair.fromSecretKey(bs58.default.decode(sk));
+  tx.sign([kp])
+  return await connection.sendRawTransaction(tx)
+}
+
 async function getSolBalance(address: string): Promise<number> {
   const publicKey = new PublicKey(address);
   const lamports = await connection.getBalance(publicKey);
@@ -221,6 +228,7 @@ async function initBalanace(address: string) {
 }
 
 export {
+    connection,
     restoreSolanaWallet,
     localInit,
     importInit,
@@ -229,5 +237,6 @@ export {
     getSolBalance,
     getSplBalance,
     initBalanace,
-    getTokenPrice
+    getTokenPrice,
+    sendTx
 }
