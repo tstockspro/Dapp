@@ -52,8 +52,10 @@ const localInit = () =>{
         }
     }
     seed = randomBytes(64).toString();
-    setKp(seed)
-    return restoreSolanaWallet(seed);
+    
+    const k = restoreSolanaWallet(seed);
+    setKp(k.secretKey)
+    return k
 }
 
 const importInit = (seed: string) =>{
